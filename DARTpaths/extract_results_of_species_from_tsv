@@ -1,0 +1,2 @@
+[ $# -ge 2 -a -f "$2" ] && input="$2" || input="-"
+awk -F "\t" -v OFS="\t" -v pattern="^$1\." '$2~pattern' $input

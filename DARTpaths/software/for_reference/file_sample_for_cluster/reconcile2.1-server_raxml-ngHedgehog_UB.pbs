@@ -1,0 +1,48 @@
+#!/bin/bash -l
+#PBS -l walltime=72:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l pmem=8gb
+#PBS -N 20200512_Hedgehog_UB
+#PBS -A lp_cosubi
+#PBS -m abe
+#PBS -M diksha.bhalla@kuleuven.be
+
+# Job-script to run raxml-ng on the HPC server using mpi. 
+
+#######################################################
+# Before uploading and running: 
+# - Fill in pbs-info at the top of this file and below this section
+# - Make sure the alignment file is placed in $VSC_DATA
+# - For more info, check General/intro-HPC-linux-leuven.pdf or https://www.vscentrum.be/
+#######################################################
+
+# Fill in: -name of protein, -amount of processes to spawn, -number of threads to use per process
+# Make sure processes*thread_per_process matches nodes*ppn
+prot=Hedgehog_UB
+processes=1              
+thread_per_process=1
+  
+echo Running raxml-ng-mpi on ${prot} with ${processes} processes and ${thread_per_process} threads per process
+
+# Set working directory
+cd ${PBS_O_WORKDIR}
+
+# Load RAxML-ng
+#module purge
+#source switch_to_2018a
+module load RAxML-NG 
+
+# Make a file containing the unique names of the machines(nodes) at our disposal
+cat ${PBS_NODEFILE} | uniq > machines
+
+# Run raxml-ng-mpi through mpirun
+# Ignore raxml warnings, it assumes dna not protein code. If this makes the software quit (to preserve resources) use --force to override this. 
+mpirun -n ${processes} \
+raxml-ng-mpi --threads ${thread_per_process} --all --msa ${VSC_DATA}/projects/DARTpaths/rec2_1_files/2020_Hedgehog/UB/${prot}_DHHC_filtered_raxml_reduced.phy \
+--model LG+G8+F \
+--tree pars{20} --bs-trees 200 \
+--extra thread-pin \
+--prefix ${VSC_DATA}/${prot}fam_tree
+
+# Delete redundant machine file when done
+#rm machines

@@ -1,0 +1,45 @@
+#!/bin/bash -l
+#PBS -l walltime=24:00:00
+#PBS -l nodes=1:ppn=20
+#PBS -l mem=8gb
+#PBS -m abe
+#PBS -M jens.vanerp@kuleuven.be
+
+# Job-script to run raxml-ng on the HPC server using mpi. 
+
+#######################################################
+# Before uploading and running: 
+# - Fill in pbs-info at the top of this file and below this section
+# - Make sure the alignment file is placed in $VSC_DATA
+# - For more info, check General/intro-HPC-linux-leuven.pdf or https://www.vscentrum.be/
+#######################################################
+
+# Fill in: -name of protein, -amount of processes to spawn, -number of threads to use per process
+# Make sure processes*thread_per_process matches nodes*ppn
+prot=proteinname
+processes=2
+thread_per_process=10
+
+echo Running raxml-ng-mpi on ${prot} with ${processes} processes and ${thread_per_process} threads per process
+
+# Set working directory
+cd ${PBS_O_WORKDIR}
+
+# Load RAxML-ng
+module purge
+source switch_to_2016a
+module load RAxML-NG/v0.51b-intel-2016a
+
+# Make a file containing the unique names of the machines(nodes) at our disposal
+cat ${PBS_NODEFILE} | uniq > machines
+
+# Run raxml-ng-mpi through mpirun
+# Ignore raxml warnings, it assumes dna not protein code. If this makes the software quit (to preserve resources) use --force to override this. 
+mpirun -n ${processes} -machinefile machines \
+raxml-ng-mpi --threads ${thread_per_process} --all --msa ${VSC_DATA}/${prot}fam_mafft_hmm.aln-gb \
+--model LG+G8+F \
+--tree pars{20} --bs-trees 200 \
+--prefix ${VSC_DATA}/${prot}fam_tree
+
+# Delete redundant machine file when done
+rm machines

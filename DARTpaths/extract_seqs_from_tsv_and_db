@@ -1,0 +1,7 @@
+[ $# -ge 1 -a -f "$1" ] && input="$1" || input="-"
+ids="$(awk -F "\t" -v OFS="\t" '{print $2}' $input)"
+
+while read -r line
+do
+	echo "$(blastdbcmd -db string_proteins -entry $line)"
+done <<< "$ids"

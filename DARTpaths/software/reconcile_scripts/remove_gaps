@@ -1,0 +1,14 @@
+## Calls Gblocks to remove major gaps in alignment.
+## Parameters (b2-5) are chosen to represent a very wide margin for position selection: we just want to remove massive gaps. 
+# -b2=0 sets -b to minimum value, -b3 is 10*default to allow for acceptance of non-conserverd positions, -b4 is set to minimum block-size, -b5 is set to allow all gap-positions to be selected)
+
+### default original values
+### used for all the analysis after AHR.(used in AHR also except for HSP(big data set) )
+### effective since: 2020/Mar/06
+${HOME}/DARTpaths/software/Gblocks_0.91b/Gblocks ${1}_alignments/${1}fam_mafft_hmm.aln \
+-t=p -b2=0 -b3=100 -b4=2 -b5=a
+
+
+## for AHR6_HSP original values of the Gblocks software
+##${HOME}/DARTpaths/software/Gblocks_0.91b/Gblocks ${1}_alignments/${1}fam_mafft_hmm.aln \
+##-t=p -b5=a

@@ -1,0 +1,2 @@
+# Call hmmbuild with the alignment file
+hmmbuild ${1}_hmms/${1}fam_v1.hmm ${1}_alignments/${1}fam_mafft_blast.aln

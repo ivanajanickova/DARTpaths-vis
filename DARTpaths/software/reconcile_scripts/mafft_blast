@@ -1,0 +1,3 @@
+# Call mafft with the blast .fasta file
+mafft ${1}_searches_blast/blast_${1}fam_sequences.fasta > ${1}_alignments/${1}fam_mafft_blast.aln
+

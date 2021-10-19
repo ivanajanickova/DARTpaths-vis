@@ -1,0 +1,43 @@
+name="hmmer_search_"${1}"fam"
+dir=${1}"_hmms/"
+
+sign_e=0.01	   # e_value cut-off
+min_overlap=0.5	   # minium ratio of overlap prot-seq/hmm-profile
+max_gap=2.0        # maximum ratio prot-seq-length/hmm-overlap-length
+
+
+# Remove comments from table, make into temporary tsv
+
+awk '$0!~/^#/' ${dir}${name}_table.out | sed -r 's/\s+/\t/g' \
+>${dir}${name}_temp.tsv
+
+
+
+# Move important data to new .tsv file
+# Protein, length, query length, domain i-Evalue, score, query match length, protein length of match
+
+awk -F "\t" -v OFS="\t" '{print $1, $3, $6, $13, $14, $17-$16+1, $19-$18+1}' ${dir}${name}_temp.tsv \
+>${dir}${name}_scores.tsv
+
+
+# Check for significant i-Evalue, copy only those proteins to temp file
+
+awk -F "\t" -v sign=$sign_e '$4<sign ' \
+${dir}${name}_scores.tsv >${dir}${name}_scores_temp.tsv
+
+# Check for minimum overlap with hmm-profile, remove any alignment that is shorter than ratio
+
+awk -F "\t" -v overlap=$min_overlap '$6>$3*overlap ' \
+${dir}${name}_scores_temp.tsv >${dir}${name}_scores_temp2.tsv
+
+
+# Check for max gap amount in alignment, remove any gap amount higher than max_gap*env-length
+
+awk -F "\t" -v gap=$max_gap '$7<$6*gap ' \
+${dir}${name}_scores_temp2.tsv >${dir}${name}_sign_scores.tsv
+
+${HOME}/DARTpaths/extract_seqs_from_hmmer_tsv_and_db ${dir}${name}_sign_scores.tsv > ${dir}${name}_sign_seqs.fasta
+
+rm ${dir}${name}_temp.tsv
+#rm ${dir}${name}_scores_temp.tsv
+#rm ${dir}${name}_scores_temp2.tsv

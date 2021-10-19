@@ -1,0 +1,3 @@
+[ $# -ge 1 -a -f "$1" ] && input="$1" || input="-"
+awk -F "\t" '{print $2}' $input | awk -F "." '{print $1}' | sort | uniq -c | sort -n | \
+awk -F "[ \t]+" -v OFS="\t" '{print $3, $2}' 

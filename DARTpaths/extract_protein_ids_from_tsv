@@ -1,0 +1,2 @@
+[ $# -ge 1 -a -f "$1" ] && input="$1" || input="-"
+awk -F "\t" '{print $2}' $input | awk -F "." '{print $2}' 
