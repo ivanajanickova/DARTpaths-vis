@@ -1,10 +1,5 @@
 # env folder
-/DARTpaths-vis/env/
-/env/
-/env/bin/
-/env/lib/
-/env/lib64/
-
+/dart-env/
 
 /DARTpaths-vis/.idea/
 
