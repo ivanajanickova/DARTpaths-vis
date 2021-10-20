@@ -9,7 +9,7 @@
 * `pip install -r requirements.txt`
 
 ## Running `Python_APRIL_2021_phenotype_enrichment.py`
-* in /DARTpaths-vis/databases folder create folders: phenotype, orthology, ontology
+* in /DARTpaths-vis/databases folder create folders: phenotype, orthologs, ontology
 * `cd` to the `Python_Phenotype_Enrichment-version_April_2021` folder
 * in the terminal window: `python3 Python_APRIL_2021_phenotype_enrichment.py R-HSA-8937144 "AHR" $HOME/DARTpaths-vis/`
 * where: 
