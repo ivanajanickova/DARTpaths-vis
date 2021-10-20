@@ -1,0 +1,23 @@
+# env folder
+/DARTpaths-vis/env/
+/env/
+/env/bin/
+/env/lib/
+/env/lib64/
+
+
+/DARTpaths-vis/.idea/
+
+# database files
+/databases/ontology/
+/databases/phenotype/
+/databases/orthologs/
+
+# phenotype term
+/phenotype term/onthology/
+
+# software files
+/DARTpaths/software/Gblocks_0.91b/
+/DARTpaths/software/ncbi-blast-2.12.0+/
+/DARTpaths/software/hmmer-3.3.1/
+/DARTpaths/software/Notung-2.9.1.5/

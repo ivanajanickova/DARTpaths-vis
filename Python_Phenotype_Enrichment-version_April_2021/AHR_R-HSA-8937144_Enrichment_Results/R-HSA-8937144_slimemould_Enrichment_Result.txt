@@ -1,0 +1,8 @@
+orthologs: 2
+totalgenes: 7
+organism: slimemould
+Enriched Phenotype	P-value	n	m	i	rank	q-value
+orthologs: 2
+totalgenes: 7
+organism: slimemould
+Enriched Phenotype	P-value	n	m	i	rank	q-value
