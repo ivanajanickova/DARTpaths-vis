@@ -90,9 +90,8 @@ if my_file.exists():
         os.remove(Reactome_file)
         wget.download('https://reactome.org/download/current/Ensembl2Reactome_All_Levels.txt', out=Reactome_file)
 else:
-  wget.download('https://reactome.org/download/current/Ensembl2Reactome_All_Levels.txt', out=Reactome_file)
+    wget.download('https://reactome.org/download/current/Ensembl2Reactome_All_Levels.txt', out=Reactome_file)
 
-  
 http = urllib3.PoolManager()
 ##### Self-update/download of Data Resources - Orhtologs+Phenotypes+Ontology by species (each species has personalized data files/inputs)
 
@@ -926,7 +925,7 @@ def addInfo(enrichedOnthologyFinal, genes, pathgenes, organism, sigenrichment):
   
 #  pathlength = len(pathgenes)    #### 2021-March-6th: This "pathgenes" 
 #  pathlength2 = str(pathlength)
-  info = open(pathID+'_'+organism+'_Enrichment_Result.txt', 'a')
+  info = open(pathID+'_'+organism+'_Enrichment_Result.txt', 'a', encoding='utf-8')
   info.write('orthologs: '+totorth2+'\n')
   
   
