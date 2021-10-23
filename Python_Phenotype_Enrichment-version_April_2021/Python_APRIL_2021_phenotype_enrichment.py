@@ -79,7 +79,6 @@ Reactome_file = path_to_phenotype_folder + "/Ensembl2Reactome_All_Levels.txt"
 my_file = Path(Reactome_file)
 print(my_file)
 
-
 # check if reactome file exists and is not older than 24 hours
 if my_file.exists():
     filetime = datetime.fromtimestamp(os.path.getctime(Reactome_file))
@@ -102,7 +101,7 @@ for organism in organism_list:
 
     if organism == "celegans":
 
-        # ENSEMBL DATABASES (orthologs) # same as the one used for orthology mapping part
+        # ENSEMBL DATABASES (orthologs), same as the one used for ortholog mapping part
         C_ele_ENSEMBL_orthology_database = path_to_orthologs_folder + "/Orthology_human_celegans_ensembl101_unique.txt"
         path = path_to_orthologs_folder
         xml_query = """<?xml version="1.0" encoding="UTF-8"?>
@@ -120,6 +119,8 @@ for organism in organism_list:
         </Query>"""
         my_file = Path(C_ele_ENSEMBL_orthology_database)
         if my_file.exists():
+            # check if file exists and is maximum one day old
+            # if older than 1 one, remove and redownload from the database
             filetime = datetime.fromtimestamp(os.path.getctime(C_ele_ENSEMBL_orthology_database))
             if filetime < days_pass:
                 os.remove(C_ele_ENSEMBL_orthology_database)
@@ -128,6 +129,7 @@ for organism in organism_list:
                 outfile.write(r.data.decode("utf-8"))
                 outfile.close()
         else:
+            # fetch file from database if it doesn't exist
             r = http.request('GET', 'http://www.ensembl.org/biomart/martservice?query=' + xml_query)
             with open(C_ele_ENSEMBL_orthology_database, 'w') as outfile:
                 outfile.write(r.data.decode("utf-8"))
@@ -138,6 +140,8 @@ for organism in organism_list:
         C_ele_phenotype_database = path_to_phenotype_folder + "/phenotype_association.WS264.wb"
         my_file = Path(C_ele_phenotype_database)
         if my_file.exists():
+            # check if file exists and is maximum one day old
+            # if older than 1 one, remove and redownload from the database
             filetime = datetime.fromtimestamp(os.path.getctime(C_ele_phenotype_database))
             if filetime < days_pass:
                 os.remove(C_ele_phenotype_database)
@@ -153,6 +157,8 @@ for organism in organism_list:
         path = path_to_ontology_folder  # TODO this is useless, we could use directly path_to_phenotype_folder
         my_file = Path(C_ele_ontology_data_file)
         if my_file.exists():
+            # check if file exists and is maximum one day old
+            # if older than 1 one, remove and redownload from the database
             filetime = datetime.fromtimestamp(os.path.getctime(C_ele_ontology_data_file))
             if filetime < days_pass:
                 os.remove(C_ele_ontology_data_file)
@@ -164,7 +170,7 @@ for organism in organism_list:
 
     elif organism == "zebrafish":
         # ENSEMBL DATABASES (orthologs) ##### same as the one used for orthology mapping part
-        Zebrafish_ENSEMBL_orthology_database = path_to_orthologs_folder + "/" + "Orthology_human_zebrafish_ensembl101_unique.txt"
+        Zebrafish_ENSEMBL_orthology_database = path_to_orthologs_folder + "/Orthology_human_zebrafish_ensembl101_unique.txt"
         path = path_to_orthologs_folder
         xml_query = """<?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE Query>
@@ -198,7 +204,7 @@ for organism in organism_list:
 
         # Phenotype database
         path = path_to_phenotype_folder
-        Zebrafish_phenotype_database = path_to_phenotype_folder + "/" + "phenoGeneCleanData_fish.txt"
+        Zebrafish_phenotype_database = path_to_phenotype_folder + "/phenoGeneCleanData_fish.txt"
         my_file = Path(Zebrafish_phenotype_database)
         if my_file.exists():
             filetime = datetime.fromtimestamp(os.path.getctime(Zebrafish_phenotype_database))
@@ -234,7 +240,7 @@ for organism in organism_list:
 
     elif organism == "mouse":
         # ENSEMBL DATABASES (orthologs) ##### same as the one used for orthology mapping part
-        Mouse_ENSEMBL_orthology_database = path_to_orthologs_folder + "/" + "Orthology_human_mouse_ensembl101_unique.txt"
+        Mouse_ENSEMBL_orthology_database = path_to_orthologs_folder + "/Orthology_human_mouse_ensembl101_unique.txt"
         path = path_to_orthologs_folder
         xml_query = """<?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE Query>
@@ -270,7 +276,7 @@ for organism in organism_list:
 
         # Phenotype database
         path = path_to_phenotype_folder
-        Mouse_phenotype_database = path_to_phenotype_folder + "/" + "ALL_genotype_phenotype.csv"
+        Mouse_phenotype_database = path_to_phenotype_folder + "/ALL_genotype_phenotype.csv"
         my_file = Path(Mouse_phenotype_database)
         if my_file.exists():
             filetime = datetime.fromtimestamp(os.path.getctime(Mouse_phenotype_database))
@@ -293,7 +299,7 @@ for organism in organism_list:
             os.remove(mouse_gz_file)
 
         # Ontology databases
-        Mouse_ontology_data_file = path_to_ontology_folder + "/" + "MPheno_OBO.ontology.txt"
+        Mouse_ontology_data_file = path_to_ontology_folder + "/MPheno_OBO.ontology.txt"
         path = path_to_ontology_folder
         my_file = Path(Mouse_ontology_data_file)
         if my_file.exists():
@@ -308,7 +314,7 @@ for organism in organism_list:
 
     elif organism == "slimemould":
         # ENSEMBL DATABASES (orthologs), same as the one used for ortholog mapping part
-        Slime_mould_ENSEMBL_orthology_database = path_to_orthologs_folder + "/" + "Orthology_human_dicty_ensembl101_unique.txt"
+        Slime_mould_ENSEMBL_orthology_database = path_to_orthologs_folder + "/Orthology_human_dicty_ensembl101_unique.txt"
         path = path_to_orthologs_folder
         my_file = Path(Slime_mould_ENSEMBL_orthology_database)
         if my_file.exists():
@@ -339,7 +345,7 @@ for organism in organism_list:
 
         # Phenotype database
         path = path_to_phenotype_folder
-        Slime_mould_phenotype_database = path_to_phenotype_folder + "/" + "all-mutants-ddb_g.txt"
+        Slime_mould_phenotype_database = path_to_phenotype_folder + "/all-mutants-ddb_g.txt"
         my_file = Path(Slime_mould_phenotype_database)
         if my_file.exists():
             filetime = datetime.fromtimestamp(os.path.getctime(Slime_mould_phenotype_database))
@@ -357,8 +363,8 @@ for organism in organism_list:
     #Already included at the Phenotype database
 
     elif organism == "dmelanogaster":
-        # ENSEMBL DATABASES (orthologs) ##### same as the one used for orthology mapping part
-        Fly_ENSEMBL_orthology_database = path_to_orthologs_folder + "/" + "Orthology_human_dmelanogaster_ensembl101_unique.txt"
+        # ENSEMBL DATABASES (orthologs), same as the one used for ortholog mapping part
+        Fly_ENSEMBL_orthology_database = path_to_orthologs_folder + "/Orthology_human_dmelanogaster_ensembl101_unique.txt"
 
         path = path_to_orthologs_folder
         xml_query = """<?xml version="1.0" encoding="UTF-8"?>
@@ -391,8 +397,8 @@ for organism in organism_list:
 
         # Phenotype database
         path = path_to_phenotype_folder
-        Fly_gene_to_allele_database = path_to_phenotype_folder + "/" + "Fly_fbal_to_fbgn_fb_current_release.tsv"
-        Fly_allele_to_phenotype_database = path_to_phenotype_folder + "/" + "Fly_allele_phenotypic_data_fb_current_release.tsv"
+        Fly_gene_to_allele_database = path_to_phenotype_folder + "/Fly_fbal_to_fbgn_fb_current_release.tsv"
+        Fly_allele_to_phenotype_database = path_to_phenotype_folder + "/Fly_allele_phenotypic_data_fb_current_release.tsv"
         my_file = Path(Fly_gene_to_allele_database)
         if my_file.exists():
             filetime = datetime.fromtimestamp(os.path.getctime(Fly_gene_to_allele_database))
