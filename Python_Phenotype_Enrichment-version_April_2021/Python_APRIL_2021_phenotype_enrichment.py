@@ -29,6 +29,10 @@ import wget  # TODO os.system('pip install wget') deleted, already in requiremen
 from datetime import datetime, timedelta
 from pathlib import Path
 
+# for the loading information for text preprocessing
+import preprocessing
+preprocessing_obj = preprocessing.DataExtraction()
+
 # this is necessary for zebrafish
 pd.options.mode.chained_assignment = None  # no warning message when working on dataframe slice
 
@@ -623,13 +627,15 @@ def removeEmptylines(ortholog):
     df_ortholog_read = pd.read_csv("pd_ortholog_clean.txt.tmp", header=None)
     df_ortholog_raw = df_ortholog_read.iloc[:, [1, 2]].copy()
     df_ortholog = df_ortholog_raw.drop_duplicates()
-
     return df_ortholog
 
 
 # Select the genes of the organism only from the ortholog file, leaving the human gene ID
 # also combine with the new orthologs
 def Readgenes(df_ortholog, df_new_orthos, organism):
+    # load information for preprocessing module
+    preprocessing_obj.add_genes_vs_orthologs_data(df_ortholog=df_ortholog, organism=organism)
+
     orthologs_combined = pd.DataFrame()
     genes_of_interest = df_ortholog.iloc[:, 0].copy()
     genes_of_interest = genes_of_interest.to_frame()
@@ -765,6 +771,10 @@ def Enrichment(organism, genes, phenotypes):
     # to see the annotated genes
     annotatedg = pd.merge(genes, phenotypes, on=['Genes'], how='inner').copy()
     uniquegenes = annotatedg.drop_duplicates(subset=['Genes'], keep='first', inplace=False)
+
+    # load to the preprocessing_obj
+    preprocessing_obj.add_ortholog_vs_phenotype_data(uniquegenes=uniquegenes, organism=organism)
+
     count_annotated_genes = len(uniquegenes.index)
     # annotated genes ends here
     uniquerows = annotatedg.drop_duplicates()
@@ -795,6 +805,7 @@ def Enrichment(organism, genes, phenotypes):
     N = count_annotated_genes
     # start modify dataframe needed for m
     uniquegenesdb = phenotypes.drop_duplicates(subset=['Genes'], keep='first', inplace=False)
+
 
     # end needed for m
     # to make the outputs
@@ -1026,6 +1037,7 @@ runEnrichment(organism_list)
 # change first the dir to the results since we want the output to be there
 os.chdir(pathway_name + "_" + pathID + "_Enrichment_Results")
 
+preprocessing_obj.save_dfs_to_files(pathway_name)
 
 # the summary function
 # First it will import all the results of the files
