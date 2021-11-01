@@ -448,6 +448,19 @@ for organism in organism_list:
     # Ontology databases
     # Already included at the Phenotype database
 
+# Extract phenotype information into files -> runs only if the files are not already created
+
+ontology_files_list = [
+    C_ele_ontology_data_file,
+    Zebrafish_GO_annotation_file,
+    Mouse_ontology_data_file
+]
+
+path_to_phenotypes = Path("ontology_data/related_phenotypes.pkl")
+path_to_names = Path("ontology_data/phenotype_names.pkl")
+if path_to_phenotypes.is_file() is False or path_to_names.is_file() is False:
+    preprocessing.extract_phenotypes_info(ontology_files_list)
+
 # Write Output to File #
 #change this to include pathway identifier and species name to keep results organized.
 
@@ -773,7 +786,7 @@ def Enrichment(organism, genes, phenotypes):
     uniquegenes = annotatedg.drop_duplicates(subset=['Genes'], keep='first', inplace=False)
 
     # load to the preprocessing_obj
-    preprocessing_obj.add_ortholog_vs_phenotype_data(uniquegenes=uniquegenes, organism=organism)
+    preprocessing_obj.add_ortholog_vs_phenotype_data(genes_phen_df=annotatedg)
 
     count_annotated_genes = len(uniquegenes.index)
     # annotated genes ends here
@@ -884,7 +897,6 @@ def openOnthology(organism):
   elif organism == "dmelanogaster":
     onthology = pd.read_csv(Fly_ontology_data_file, sep=";", names=['Ontology'])    
     '''
-
     return onthology, onthology_zfa
 
 
@@ -987,7 +999,7 @@ def addInfo(enrichedOnthologyFinal, genes, pathgenes, organism, sigenrichment):
 
     #  pathlength = len(pathgenes)    #### 2021-March-6th: This "pathgenes"
     #  pathlength2 = str(pathlength)
-    info = open(pathID + '_' + organism + '_Enrichment_Result.txt', 'a', encoding='utf-8')
+    info = open(pathID + '_' + organism + '_Enrichment_Result.txt', 'w', encoding='utf-8')
     info.write('orthologs: ' + totorth2 + '\n')
 
     info.write('totalgenes: ' + str_num_human_prots + '\n')  ##### 2021-March-6th: needs fix.
@@ -995,10 +1007,15 @@ def addInfo(enrichedOnthologyFinal, genes, pathgenes, organism, sigenrichment):
     info.write('organism: ' + organism + '\n')
     if organism == "slimemould":
         sigenrichment.to_csv(info, index=False, sep='\t')
+        #TODO
+        #preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=sigenrichment)
     elif organism == "dmelanogaster":
         sigenrichment.to_csv(info, index=False, sep='\t')
+        #TODO
+        #preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=sigenrichment)
     else:
         enrichedOnthologyFinal.to_csv(info, index=False, sep='\t')
+        preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=enrichedOnthologyFinal)
     info.close()
 
 
@@ -1031,13 +1048,14 @@ def runEnrichment(organism_list):
 
 
 # Run the enrichment here.
-runEnrichment(organism_list)
+new_organism_list = organism_list = ["celegans"]
+
+runEnrichment(new_organism_list)
 
 ####Next section is to run the new summary conservation feature as suggested by Prof
 # change first the dir to the results since we want the output to be there
 os.chdir(pathway_name + "_" + pathID + "_Enrichment_Results")
 
-preprocessing_obj.save_dfs_to_files(pathway_name)
 
 # the summary function
 # First it will import all the results of the files
@@ -1063,3 +1081,6 @@ def runSummary():
 
 
 runSummary()
+
+preprocessing_obj.save_data_to_files()
+
