@@ -29,6 +29,10 @@ import wget  # TODO os.system('pip install wget') deleted, already in requiremen
 from datetime import datetime, timedelta
 from pathlib import Path
 
+# for the loading information for text preprocessing
+import preprocessing
+preprocessing_obj = preprocessing.DataExtraction()
+
 # this is necessary for zebrafish
 pd.options.mode.chained_assignment = None  # no warning message when working on dataframe slice
 
@@ -50,7 +54,7 @@ except IndexError:
 
 # Path definitions
 
-path_to_databases = path_root + "databases"
+path_to_databases = path_root + "/databases"
 path_to_orthologs_folder = path_to_databases + "/orthologs"
 path_to_phenotype_folder = path_to_databases + "/phenotype"
 path_to_ontology_folder = path_to_databases + "/ontology"
@@ -444,6 +448,20 @@ for organism in organism_list:
     # Ontology databases
     # Already included at the Phenotype database
 
+# Extract phenotype information into files -> runs only if the files are not already created
+
+ontology_files_list = [
+    C_ele_ontology_data_file,
+    Zebrafish_GO_annotation_file,
+    Mouse_ontology_data_file
+]
+
+path_to_phenotypes = Path("ontology_data/related_phenotypes.pkl")
+path_to_names = Path("ontology_data/phenotype_names.pkl")
+if path_to_phenotypes.is_file() is False or path_to_names.is_file() is False:
+    preprocessing.extract_phenotypes_info(ontology_files_list)
+
+
 # Write Output to File #
 #change this to include pathway identifier and species name to keep results organized.
 
@@ -623,13 +641,15 @@ def removeEmptylines(ortholog):
     df_ortholog_read = pd.read_csv("pd_ortholog_clean.txt.tmp", header=None)
     df_ortholog_raw = df_ortholog_read.iloc[:, [1, 2]].copy()
     df_ortholog = df_ortholog_raw.drop_duplicates()
-
     return df_ortholog
 
 
 # Select the genes of the organism only from the ortholog file, leaving the human gene ID
 # also combine with the new orthologs
 def Readgenes(df_ortholog, df_new_orthos, organism):
+    # load information for preprocessing module
+    preprocessing_obj.add_genes_vs_orthologs_data(df_ortholog=df_ortholog, organism=organism)
+
     orthologs_combined = pd.DataFrame()
     genes_of_interest = df_ortholog.iloc[:, 0].copy()
     genes_of_interest = genes_of_interest.to_frame()
@@ -765,6 +785,10 @@ def Enrichment(organism, genes, phenotypes):
     # to see the annotated genes
     annotatedg = pd.merge(genes, phenotypes, on=['Genes'], how='inner').copy()
     uniquegenes = annotatedg.drop_duplicates(subset=['Genes'], keep='first', inplace=False)
+
+    # load to the preprocessing_obj
+    preprocessing_obj.add_ortholog_vs_phenotype_data(genes_phen_df=annotatedg)
+
     count_annotated_genes = len(uniquegenes.index)
     # annotated genes ends here
     uniquerows = annotatedg.drop_duplicates()
@@ -795,6 +819,7 @@ def Enrichment(organism, genes, phenotypes):
     N = count_annotated_genes
     # start modify dataframe needed for m
     uniquegenesdb = phenotypes.drop_duplicates(subset=['Genes'], keep='first', inplace=False)
+
 
     # end needed for m
     # to make the outputs
@@ -873,7 +898,6 @@ def openOnthology(organism):
   elif organism == "dmelanogaster":
     onthology = pd.read_csv(Fly_ontology_data_file, sep=";", names=['Ontology'])    
     '''
-
     return onthology, onthology_zfa
 
 
@@ -976,7 +1000,7 @@ def addInfo(enrichedOnthologyFinal, genes, pathgenes, organism, sigenrichment):
 
     #  pathlength = len(pathgenes)    #### 2021-March-6th: This "pathgenes"
     #  pathlength2 = str(pathlength)
-    info = open(pathID + '_' + organism + '_Enrichment_Result.txt', 'a', encoding='utf-8')
+    info = open(pathID + '_' + organism + '_Enrichment_Result.txt', 'w', encoding='utf-8')
     info.write('orthologs: ' + totorth2 + '\n')
 
     info.write('totalgenes: ' + str_num_human_prots + '\n')  ##### 2021-March-6th: needs fix.
@@ -984,10 +1008,13 @@ def addInfo(enrichedOnthologyFinal, genes, pathgenes, organism, sigenrichment):
     info.write('organism: ' + organism + '\n')
     if organism == "slimemould":
         sigenrichment.to_csv(info, index=False, sep='\t')
+        preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=sigenrichment)
     elif organism == "dmelanogaster":
         sigenrichment.to_csv(info, index=False, sep='\t')
+        preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=sigenrichment)
     else:
         enrichedOnthologyFinal.to_csv(info, index=False, sep='\t')
+        preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=enrichedOnthologyFinal)
     info.close()
 
 
@@ -1051,3 +1078,7 @@ def runSummary():
 
 
 runSummary()
+
+preprocessing_obj.filter_phenotypes()
+preprocessing_obj.save_data_to_files()
+
