@@ -54,7 +54,7 @@ except IndexError:
 
 # Path definitions
 
-path_to_databases = path_root + "databases"
+path_to_databases = path_root + "/databases"
 path_to_orthologs_folder = path_to_databases + "/orthologs"
 path_to_phenotype_folder = path_to_databases + "/phenotype"
 path_to_ontology_folder = path_to_databases + "/ontology"
@@ -460,6 +460,7 @@ path_to_phenotypes = Path("ontology_data/related_phenotypes.pkl")
 path_to_names = Path("ontology_data/phenotype_names.pkl")
 if path_to_phenotypes.is_file() is False or path_to_names.is_file() is False:
     preprocessing.extract_phenotypes_info(ontology_files_list)
+
 
 # Write Output to File #
 #change this to include pathway identifier and species name to keep results organized.
@@ -1007,12 +1008,10 @@ def addInfo(enrichedOnthologyFinal, genes, pathgenes, organism, sigenrichment):
     info.write('organism: ' + organism + '\n')
     if organism == "slimemould":
         sigenrichment.to_csv(info, index=False, sep='\t')
-        #TODO
-        #preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=sigenrichment)
+        preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=sigenrichment)
     elif organism == "dmelanogaster":
         sigenrichment.to_csv(info, index=False, sep='\t')
-        #TODO
-        #preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=sigenrichment)
+        preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=sigenrichment)
     else:
         enrichedOnthologyFinal.to_csv(info, index=False, sep='\t')
         preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=enrichedOnthologyFinal)
@@ -1048,9 +1047,7 @@ def runEnrichment(organism_list):
 
 
 # Run the enrichment here.
-new_organism_list = organism_list = ["celegans"]
-
-runEnrichment(new_organism_list)
+runEnrichment(organism_list)
 
 ####Next section is to run the new summary conservation feature as suggested by Prof
 # change first the dir to the results since we want the output to be there
@@ -1082,5 +1079,6 @@ def runSummary():
 
 runSummary()
 
+preprocessing_obj.filter_phenotypes()
 preprocessing_obj.save_data_to_files()
 
