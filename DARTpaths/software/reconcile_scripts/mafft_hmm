@@ -1,3 +1,0 @@
-# Call mafft with the hmm .fasta file
-mafft ${1}_hmms/hmmer_search_${1}fam_sign_seqs.fasta > ${1}_alignments/${1}fam_mafft_hmm.aln
-
