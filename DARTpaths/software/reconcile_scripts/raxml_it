@@ -1,4 +1,0 @@
-# Calls raxml-ng to make trees out of short alignments
-# ../software/raxml-ng/raxml-ng --all --msa ${1}_alignments/${1}fam_mafft_hmm.aln-gb \ # original script. change path to absolute
-${HOME}/DARTpaths/software/raxml-ng/raxml-ng --all --msa ${1}_alignments/${1}fam_mafft_hmm.aln-gb \
---model LG+G8+F --tree pars{20} --bs-trees 200 --prefix ${1}_trees/${1}fam_tree --force
