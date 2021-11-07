@@ -52,8 +52,8 @@ for index, row in gene_df.iterrows():
         pos_x = random.randint(0, 45)
     else:
         pos_x = random.randint(55, 100)
-    pos_y = random.randint(1, 100)
-    cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'organism': organism}, 'classes': 'red', 'position': {'x': pos_x, 'y': pos_y}}
+    pos_y_ortholog = pos_y + random.randint(0, 2)  # this only works for one ortholog
+    cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'organism': organism}, 'classes': 'red', 'position': {'x': pos_x, 'y': pos_y_ortholog}}
     cy_edge = {'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog}}
 
     # add genes and orthologs to set nodes and cy nodes
@@ -64,7 +64,8 @@ for index, row in gene_df.iterrows():
     if ortholog not in nodes_set:
         # TODO not entirely sure this will work, since multiple genes can have single ortholog
         nodes_set.add(ortholog)
-        nodes.append(cy_ortholog)
+
+    nodes.append(cy_ortholog)
 
     edges.append(cy_edge)
 
