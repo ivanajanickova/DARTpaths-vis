@@ -1,0 +1,142 @@
+Human_protein,Ortholog_id,Organism,Phenotype,,,,,Preference
+ENSG00000063438,FBgn0003513,dmelanogaster,abnormal size,,,,,abnormal size
+ENSG00000063438,FBgn0003513,dmelanogaster,labial sensillum,somatic clone,,,, 'labial sensillum | somatic clone'
+ENSG00000063438,FBgn0003513,dmelanogaster,abnormal neuroanatomy,adult stage,,,," 'abnormal neuroanatomy | adult stage', "
+ENSG00000063438,FBgn0003513,dmelanogaster,abnormal visual perception,adult stage,,,,abnormal visual perception'
+ENSG00000063438,FBgn0003513,dmelanogaster,mesothoracic leg,,,,,mesothoracic leg'
+ENSG00000063438,FBgn0003513,dmelanogaster,mesothoracic tarsal segment,ectopic,distal,,,mesothoracic tarsal segment | distal | ectopic
+ENSG00000063438,FBgn0003513,dmelanogaster,femur,distal,,,,femur | distal
+ENSG00000063438,FBgn0003513,dmelanogaster,abnormal neuroanatomy,somatic clone,,,,abnormal neuroanatomy | somatic clone
+ENSG00000063438,FBgn0003513,dmelanogaster,dendrite & dorsal multidendritic neuron ddaB,somatic clone,,,,dendrite & dorsal multidendritic neuron ddaB | somatic clone
+ENSG00000063438,FBgn0003513,dmelanogaster,lethal,recessive,,,,lethal | recessive
+ENSG00000063438,FBgn0003513,dmelanogaster,tarsal segment,ectopic,,,,tarsal segment | ectopic
+ENSG00000063438,FBgn0003513,dmelanogaster,posterior vertical bristle,,,,,posterior vertical bristle'
+ENSG00000063438,FBgn0003513,dmelanogaster,vertical bristle,,,,, 'vertical bristle
+ENSG00000063438,FBgn0003513,dmelanogaster,fifth segment of antenna,,,,,fifth segment of antenna
+ENSG00000063438,FBgn0003513,dmelanogaster,leg,ectopic,,,,leg | ectopic
+ENSG00000063438,FBgn0003513,dmelanogaster,metatarsus,,,,,metatarsus
+ENSG00000063438,FBgn0003513,dmelanogaster,sex comb,ectopic,,,,sex comb | ectopic
+ENSG00000063438,FBgn0003513,dmelanogaster,scutellar bristle,,,,,scutellar bristle'
+ENSG00000063438,FBgn0003513,dmelanogaster,ventral thoracic disc,,,,, 'ventral thoracic disc
+ENSG00000063438,FBgn0003513,dmelanogaster,yellow ommatidium,somatic clone,,,,yellow ommatidium | somatic clone'
+ENSG00000063438,FBgn0003513,dmelanogaster,abnormal gravitaxis,,,,, 'abnormal gravitaxis'
+ENSG00000063438,FBgn0003513,dmelanogaster,eye photoreceptor cell,heat sensitive,,,,eye photoreceptor cell | heat sensitive
+ENSG00000063438,FBgn0003513,dmelanogaster,abnormal courtship behavior,,,,,abnormal courtship behavior'
+ENSG00000063438,FBgn0003513,dmelanogaster,abnormal memory,,,,,abnormal memory
+ENSG00000063438,FBgn0003513,dmelanogaster,flightless,recessive,,,,flightless | recessive
+ENSG00000063438,FBgn0003513,dmelanogaster,mesothoracic tarsal segment,distal ,ectopic,,,mesothoracic tarsal segment | distal | ectopic
+ENSG00000063438,FBgn0003513,dmelanogaster,mesothoracic leg disc,larval stage,,,,mesothoracic leg disc | larval stage
+ENSG00000063438,FBgn0003513,dmelanogaster,metathoracic tarsal segment,,,,,metathoracic tarsal segment
+ENSG00000063438,FBgn0003513,dmelanogaster,prothoracic tarsal segment,,,,,prothoracic tarsal segment
+ENSG00000063438,FBgn0003513,dmelanogaster,female semi-sterile,,,,,female semi-sterile
+ENSG00000063438,FBgn0003513,dmelanogaster,arista,proximal,,,,arista | proximal
+ENSG00000063438,FBgn0003513,dmelanogaster,photoreceptor cell R7 of yellow ommatidium,ectopic,,,,photoreceptor cell R7 of yellow ommatidium | ectopic
+ENSG00000063438,FBgn0003513,dmelanogaster,cell autonomous,somatic clone,,,,cell autonomous | somatic clone
+ENSG00000063438,FBgn0003513,dmelanogaster,maxillary palpus,,,,,maxillary palpus'
+ENSG00000063439,Ahrr,mouse,arthrogryposis multiplex congenita,,,,,MP:0005377
+ENSG00000063440,Ahrr,mouse,autoimmune disease of the nervous system,,,,,MP:0004738
+ENSG00000063441,Ahrr,mouse,Behr syndrome,,,,,MP:0002757
+ENSG00000063442,Ahrr,mouse,central nervous system disease ,,,,,MP:0005561
+ENSG00000063443,Ahrr,mouse,congenital nervous system abnormality ,,,,,MP:0005564
+ENSG00000063444,Ahrr,mouse,diplegia of upper limb,,,,,MP:0000186
+ENSG00000063445,Ahrr,mouse,dopamine beta-hydroxylase deficiency,,,,,MP:0001325
+ENSG00000063446,Ahrr,mouse,Gerstmann syndrome,,,,,MP:0011396
+ENSG00000063447,WBGene00000096,celegans,velocity of movement variant,activity level abnormal,,,,WBPhenotype:0000625
+ENSG00000063448,WBGene00000096,celegans,dwelling variant,activity level abnormal,,,,WBPhenotype:0002261
+ENSG00000063449,WBGene00000096,celegans,recovery from enhanced locomotion variant,activity level abnormal,,,,WBPhenotype:0001510
+ENSG00000063450,WBGene00000096,celegans,hyperactive,activity level abnormal,,,,WBPhenotype:0001331
+ENSG00000063451,WBGene00000096,celegans,roaming variant,,,,,WBPhenotype:0000625
+ENSG00000063452,WBGene00000096,celegans,locomotion reduced,,,,,WBPhenotype:0002261
+ENSG00000063453,WBGene00000096,celegans,movement defect,,,,,WBPhenotype:0001331
+ENSG00000063454,WBGene00000096,celegans,uncoordinated,,,,,WBPhenotype:0001510
+ENSG00000096384,FBgn0001233,dmelanogaster,eye photoreceptor cell,heat sensitive,,,,
+ENSG00000096384,FBgn0001234,dmelanogaster,abnormal neuroanatomy,somatic clone,,,,
+ENSG00000096384,FBgn0001235,dmelanogaster,dendrite & dorsal multidendritic neuron ddaB,somatic clone,,,,
+ENSG00000096384,FBgn0001236,dmelanogaster,leg joint,somatic clone,,,,
+ENSG00000096384,FBgn0001237,dmelanogaster,leg anterior compartment',adult stage,,,,
+ENSG00000096384,FBgn0001238,dmelanogaster,ventral thoracic disc,,,,,
+ENSG00000096384,WBGene00000915,celegans,path curvature variant,,,,,
+ENSG00000096384,WBGene00000915,celegans,burrowing assay distance abnormal,,,,,
+ENSG00000096384,WBGene00000915,celegans,Pluronic gel burrowing impaired,,,,,
+ENSG00000096384,WBGene00000915,celegans,burrowing in response to high population density increased,,,,,
+ENSG00000096384,WBGene00000915,celegans,coiler,,,,,
+ENSG00000096384,WBGene00000915,celegans,kinker,,,,,
+ENSG00000096384,WBGene00000915,celegans,Pluronic gel burrowing impaired,,,,,
+ENSG00000096384,Hsp90ab1,mouse,abnormal cardiac morphology,,,,,
+ENSG00000096384,Hsp90ab1,mouse,abnormal heart,,,,,
+ENSG00000106546,FBgn0003513,dmelanogaster,wing disc,,,,,
+ENSG00000106546,,dmelanogaster,abnormal courtship behavior,,,,,
+ENSG00000106546,,dmelanogaster,yellow ommatidium,,,,,
+ENSG00000106546,,dmelanogaster,pale ommatidium,,,,,
+ENSG00000106546,,dmelanogaster,increased cell death,,,,,
+ENSG00000110711,FBgn0030345,dmelanogaster,photoreceptor cell R7 of pale ommatidium,heat sensitive,,,,
+ENSG00000110711,,dmelanogaster,abnormal gravitaxis,,,,,
+ENSG00000110711,,dmelanogaster,tracheal branch primordium,,,,,
+ENSG00000110711,,dmelanogaster,denticle belt,,,,,
+ENSG00000110711,,dmelanogaster,dendrite & dorsal multidendritic neuron ddaB,,,,,
+ENSG00000110711,,dmelanogaster,pretarsus ,,,,,
+ENSG00000110711,,dmelanogaster,leg anterior compartment,,,,,
+ENSG00000110711,,zebrafish,abnormal,,,,,
+ENSG00000110711,,zebrafish,abnormal pharyngeal arch 3-7 skeleton quality,,,,,
+ENSG00000110711,,zebrafish,abnormal musculoskeletal movement quality,,,,,
+ENSG00000110958,FBgn0037728,dmelanogaster,abnormal posterior lateral line neuromast quality,,,,,
+ENSG00000110958,,dmelanogaster,abnormal courtship behavior,,,,,
+ENSG00000110958,,dmelanogaster,yellow ommatidium,,,,,
+ENSG00000110958,,dmelanogaster,pale ommatidium,,,,,
+ENSG00000110958,,dmelanogaster,increased cell death,,,,,
+ENSG00000110958,,dmelanogaster,photoreceptor cell R7 of pale ommatidium,,,,,
+ENSG00000110958,,dmelanogaster,wing disc,,,,,
+ENSG00000110958,,mouse,cardiac dysplasia,,,,,
+ENSG00000110958,,mouse,abnormal gland morphology,,,,,
+ENSG00000110958,,mouse,abnormal cardiac morphology,,,,,
+ENSG00000110958,,mouse,spastic locomotion,,,,,
+ENSG00000110958,,zebrafish,path curvature variant,,,,,
+ENSG00000110958,,zebrafish,whole organism bent,,,,,
+ENSG00000110958,,celegans,coiler,,,,,
+ENSG00000110958,,celegans,kinker,,,,,
+ENSG00000110958,,celegans,roller,,,,,
+ENSG00000110958,,celegans,sinusoidal movement variant,,,,,
+ENSG00000110958,,celegans,spastic locomotion,,,,,
+ENSG00000110958,,celegans,path curvature variant,,,,,
+ENSG00000110958,,celegans,directionality variant,,,,,
+ENSG00000110958,,celegans,Pluronic gel burrowing impaired,,,,,
+ENSG00000143437,FBgn0264075,dmelanogaster,eye color defective,,,,,
+ENSG00000143437,FBgn0002723,dmelanogaster,decreased body size,,,,,
+ENSG00000143437,FBgn0261703,dmelanogaster,increased body size,,,,,
+ENSG00000143437,,dmelanogaster,abnormal dorsal/ventral axis specification,,,,,
+ENSG00000143437,,dmelanogaster,abnormal axis specification,,,,,
+ENSG00000143437,,dmelanogaster,abnormal whole organism bent,,,,,
+ENSG00000143437,,mouse,abnormal whole organism shape,,,,,
+ENSG00000143437,,celegans,high temperature induced L1 arrest,,,,,
+ENSG00000143437,,celegans,organism heat hypersensitive,,,,,
+ENSG00000143437,,celegans,noxious heat avoidance defective,,,,,
+ENSG00000143437,,slimemould,abnormal posterior lateral line neuromast quality,,,,,
+ENSG00000143437,,slimemould,abnormal response to external stimulus quality,,,,,
+ENSG00000172379,FBgn0264075,mouse,abnormal musculoskeletal movement quality,,,,,
+ENSG00000172379,FBgn0023076,mouse,abnormal pharyngeal arch 3-7 skeleton quality,,,,,
+ENSG00000172379,FBgn0002723,mouse,"abnormal whole organism bent, abnormal",,,,,
+ENSG00000172379,,mouse,abnormal whole organism shape,,,,,
+ENSG00000172379,,celegans,abnormal mouth,,,,,
+ENSG00000172379,,celegans,reproductive longevity shortened,,,,,
+ENSG00000172379,,celegans,reproductive longevity extended,,,,,
+ENSG00000172379,,celegans,male reproductive longevity extended,,,,,
+ENSG00000172379,,celegans,acquired thermotolerance variant,,,,,
+ENSG00000172379,,celegans,thermotolerance reduced,,,,,
+ENSG00000172379,,celegans,thermotolerance increased,,,,,
+ENSG00000172379,,celegans,cold hypersensitive,,,,,
+ENSG00000172379,,celegans,thermosensory behavior variant,,,,,
+ENSG00000172379,,celegans,temperature induced dauer formation variant,,,,,
+ENSG00000172379,,slimemould,organism heat response variant,,,,,
+ENSG00000172379,,slimemould,temperature influenced life span variant,,,,,
+ENSG00000096384,DDB_G0267400,mouse,cold resistant,,,,,
+ENSG00000096384,DDB_G0267401,mouse,hormetic temperature induced life span extension defective,,,,,
+ENSG00000096384,DDB_G0267402,mouse,spastic locomotion,,,,,
+ENSG00000096384,WBGene00000096,celegans,path curvature variant,,,,,
+ENSG00000096384,WBGene00000097,celegans,reproductive longevity shortened,,,,,
+ENSG00000096384,WBGene00000098,celegans,spastic locomotion,,,,,
+ENSG00000096384,WBGene00000099,celegans,path curvature variant,,,,,
+ENSG00000110958,DDB_G0268042,dmelanogaster,abnormal flight,,,,,
+ENSG00000110958,DDB_G0268042,dmelanogaster,chemical resistant,larval stage,,,,
+ENSG00000110958,DDB_G0268042,dmelanogaster,decreased fecundity,,,,,
+ENSG00000110958,DDB_G0268024,dmelanogaster,partially lethal - majority die,,,,,
+ENSG00000110958,DDB_G0268024,dmelanogaster,short lived,,,,,
