@@ -15,7 +15,7 @@
 * where: 
   * R-HSA-69239 = reactome pathway
   * "AHR" = pathay name
-  * $HOME/DARTpaths-vis/ = path to the root (WILL BE DIFFERENT IN WINDOWS)
+  * $HOME/DARTpaths-vis = path to the root (WILL BE DIFFERENT IN WINDOWS)
 
 ## Extending code
 * activate env

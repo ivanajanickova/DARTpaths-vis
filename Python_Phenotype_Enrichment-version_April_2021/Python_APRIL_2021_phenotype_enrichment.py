@@ -25,7 +25,10 @@ import urllib3
 import gzip
 import shutil
 import wget  # TODO os.system('pip install wget') deleted, already in requirements.txt
-
+#Clover add
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+#----------
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -216,9 +219,9 @@ for organism in organism_list:
                 os.remove(Zebrafish_phenotype_database)
                 wget.download('https://zfin.org/downloads/phenoGeneCleanData_fish.txt',
                               out=Zebrafish_phenotype_database)
-            else:
-                wget.download('https://zfin.org/downloads/phenoGeneCleanData_fish.txt',
-                              out=Zebrafish_phenotype_database)
+        else:
+            wget.download('https://zfin.org/downloads/phenoGeneCleanData_fish.txt',
+                          out=Zebrafish_phenotype_database)
 
         # Ontology databases
         Zebrafish_ontology_data_file = path_to_ontology_folder + "/" + "anatomy_item.txt"
@@ -230,8 +233,8 @@ for organism in organism_list:
             if filetime < days_pass:
                 os.remove(Zebrafish_ontology_data_file)
                 wget.download('https://zfin.org/downloads/anatomy_item.txt', out=Zebrafish_ontology_data_file)
-            else:
-                wget.download('https://zfin.org/downloads/anatomy_item.txt', out=Zebrafish_ontology_data_file)
+        else:
+            wget.download('https://zfin.org/downloads/anatomy_item.txt', out=Zebrafish_ontology_data_file)
 
         my_file = Path(Zebrafish_GO_annotation_file)
         if my_file.exists():
@@ -239,8 +242,8 @@ for organism in organism_list:
             if filetime < days_pass:
                 os.remove(Zebrafish_GO_annotation_file)
                 wget.download('http://current.geneontology.org/ontology/go.obo', out=Zebrafish_GO_annotation_file)
-            else:
-                wget.download('http://current.geneontology.org/ontology/go.obo', out=Zebrafish_GO_annotation_file)
+        else:
+            wget.download('http://current.geneontology.org/ontology/go.obo', out=Zebrafish_GO_annotation_file)
 
     elif organism == "mouse":
         # ENSEMBL DATABASES (orthologs) ##### same as the one used for orthology mapping part
@@ -974,7 +977,7 @@ def createResultFolder():
 
 ### file downloaded at the very begining for data preparation.
 
-path_to_this_pathways_Reactome_file = path_root + "DARTpaths/Pathway_files" + "/" + pathway_name + "_pathway_proteins_" + pathID + ".tsv"
+path_to_this_pathways_Reactome_file = path_root + "/DARTpaths/Pathway_files" + "/" + pathway_name + "_pathway_proteins_" + pathID + ".tsv"
 
 file_reactome = open(path_to_this_pathways_Reactome_file, "r")
 Counter = 0
