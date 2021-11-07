@@ -18,6 +18,7 @@ import dash_cytoscape as cyto
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
+import random
 
 # Load data
 gene_df = pd.read_csv('data.csv', delimiter=',')
@@ -39,8 +40,20 @@ for index, row in gene_df.iterrows():
     organism = row['Organism']
 
     # add data and class info to the nodes
-    cy_gene = {'data': {'id': gene, 'label': gene}, 'classes': 'blue'}
-    cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'organism': organism}, 'classes': 'red'}
+    # gene node
+    # randomize position
+    pos_x = 50
+    pos_y = random.randint(1, 100)
+    cy_gene = {'data': {'id': gene, 'label': gene}, 'classes': 'blue', 'position': {'x': pos_x, 'y': pos_y}}
+
+    # ortholog node
+    # randomize left or right side position of node
+    if bool(random.getrandbits(1)) is True:
+        pos_x = random.randint(0, 45)
+    else:
+        pos_x = random.randint(55, 100)
+    pos_y = random.randint(1, 100)
+    cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'organism': organism}, 'classes': 'red', 'position': {'x': pos_x, 'y': pos_y}}
     cy_edge = {'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog}}
 
     # add genes and orthologs to set nodes and cy nodes
@@ -64,7 +77,17 @@ graph_stylesheet = [
     {
         'selector': 'nodes',
         'style': {
-            'content': 'data(label)'
+            'content': 'data(label)',
+            'width': '4',
+            'height': '4',
+            'font-size': '2px',
+        }
+    },
+    {
+        'selector':'edges',
+        'style': {
+            'width': '0.25',
+            'line-color': 'grey'
         }
     },
     {
@@ -90,12 +113,11 @@ node_graph = dbc.Row([
         html.Div(children=[
             cyto.Cytoscape(
                 id='cytoscape-phenotype',
+                layout={'name': 'preset'},
                 elements=edges + nodes,
                 stylesheet=graph_stylesheet,
-                style={
-                    'width': '100%',  # Take up 100% of the width of the space it has been assigned
-                    'height': '87vh'  # 87vh = 87% of the total screen height
-                },
+                style={'width': '90%', 'height': '95vh'},
+
                 responsive=True  # Changes size cystocape graph is browser window changes size
             )
         ])
