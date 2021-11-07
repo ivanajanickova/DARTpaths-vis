@@ -38,6 +38,7 @@ for index, row in gene_df.iterrows():
     phenotype = row['associated_phenotype']
     organism = row['Organism']
 
+    # add data and class info to the nodes
     cy_gene = {'data': {'id': gene, 'label': gene}, 'classes': 'blue'}
     cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'organism': organism}, 'classes': 'red'}
     cy_edge = {'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog}}
@@ -58,6 +59,7 @@ for index, row in gene_df.iterrows():
 #        Graph          #
 #########################
 
+# style for the graph: node colours, names
 graph_stylesheet = [
     {
         'selector': 'nodes',
@@ -82,6 +84,7 @@ graph_stylesheet = [
 
 ]
 
+# graph itself
 node_graph = dbc.Row([
     dbc.Col(
         html.Div(children=[
@@ -100,6 +103,8 @@ node_graph = dbc.Row([
 ]
 )
 
+# specify window
+# TODO add windows for metadata and all the funky stuff
 window = html.Div(
     id='window',
     children=[
