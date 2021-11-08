@@ -11,6 +11,8 @@
 # TODO play with the layouts (I don't like grids)
 
 # Import modules
+import math
+
 import numpy
 import pandas as pd
 import dash
@@ -30,14 +32,20 @@ nodes_set = set()  # to avoid duplication
 
 N = len(gene_df.index)  # total number of genes TODO maybe do this as set
 
+# for node positions
 count_n = 1  # count for x_pos of gene nodes
+x_all = []
+y_all = []
 
 # Load data into nodes and edges
 for index, row in gene_df.iterrows():
     # source node is human gene
     gene = str(row['2'])
     # target node is ortholog
-    ortholog = str(row['1'])
+    # TODO get rid of Nans
+    ortholog_all = row['1']
+    if not ortholog_all == ["FBgn0003513"]:
+        ortholog = str(ortholog_all)
     # TODO add phenotype nodes
 
     phenotype = row['associated_phenotype']
@@ -47,9 +55,9 @@ for index, row in gene_df.iterrows():
     # gene node
     # position
     pos_x = 50
-    pos_y = 1  #intialise outside for loop
-    if count_n < N:
-        pos_y = 1000 - numpy.log(count_n/N)*50  # normalise count_n/N, otherwise logarithmical
+    pos_y = 1  # intialise outside if/else block
+    if count_n <= N:
+        pos_y = 1000 - numpy.log(count_n / N) * 50  # normalise count_n/N, otherwise logarithmical
     else:
         print("something went wrong")
 
@@ -57,13 +65,33 @@ for index, row in gene_df.iterrows():
 
     # ortholog node
     # randomize left or right side position of node
+    # TODO store pos_x and pos_y of ortholog nodes in list/dict and when assigning new locations, check if it is not taken already
+
     if bool(random.getrandbits(1)) is True:
         pos_x = random.randint(0, 45)
     else:
         pos_x = random.randint(55, 100)
 
-    pos_y_ortholog = pos_y + random.randint(0, 2)  # this only works for one ortholog
-    cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'organism': organism}, 'classes': 'red', 'position': {'x': pos_x, 'y': pos_y_ortholog}}
+
+    def check_position(position_list, position_float):
+        """ Checks if node position is already present in list of positions
+        If it is not true, the position is returned and added to the list of positions
+        otherwise, the function is called upon itself.
+
+        :param position_list: list where the positions are stored
+        :param position_float: the position of relate gene node
+        """
+        position = position_float + random.randint(0, 2)
+        if position not in position_list:
+            position_list.append(position)
+            return position
+        else:
+            check_position(position_list, position_float)
+
+    pos_y_ortholog = check_position(y_all, pos_y)  # call the function
+
+    cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'organism': organism}, 'classes': 'red',
+                   'position': {'x': pos_x, 'y': pos_y_ortholog}}
     cy_edge = {'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog}}
 
     # add genes and orthologs to set nodes and cy nodes
@@ -94,7 +122,7 @@ graph_stylesheet = [
             'width': '4',
             'height': '4',
             'font-size': '2px',
-            #'colour': 'data(organism)'
+            # 'colour': 'data(organism)'
         }
     },
     {
