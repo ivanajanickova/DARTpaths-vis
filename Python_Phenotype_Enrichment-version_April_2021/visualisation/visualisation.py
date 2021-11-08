@@ -11,7 +11,7 @@
 # TODO play with the layouts (I don't like grids)
 
 # Import modules
-
+import numpy
 import pandas as pd
 import dash
 import dash_cytoscape as cyto
@@ -28,6 +28,10 @@ nodes = []
 edges = []
 nodes_set = set()  # to avoid duplication
 
+N = len(gene_df.index)  # total number of genes TODO maybe do this as set
+
+count_n = 1  # count for x_pos of gene nodes
+
 # Load data into nodes and edges
 for index, row in gene_df.iterrows():
     # source node is human gene
@@ -41,9 +45,14 @@ for index, row in gene_df.iterrows():
 
     # add data and class info to the nodes
     # gene node
-    # randomize position
+    # position
     pos_x = 50
-    pos_y = random.randint(1, 100)
+    pos_y = 1  #intialise outside for loop
+    if count_n < N:
+        pos_y = 1000 - numpy.log(count_n/N)*50  # normalise count_n/N, otherwise logarithmical
+    else:
+        print("something went wrong")
+
     cy_gene = {'data': {'id': gene, 'label': gene}, 'classes': 'blue', 'position': {'x': pos_x, 'y': pos_y}}
 
     # ortholog node
@@ -52,6 +61,7 @@ for index, row in gene_df.iterrows():
         pos_x = random.randint(0, 45)
     else:
         pos_x = random.randint(55, 100)
+
     pos_y_ortholog = pos_y + random.randint(0, 2)  # this only works for one ortholog
     cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'organism': organism}, 'classes': 'red', 'position': {'x': pos_x, 'y': pos_y_ortholog}}
     cy_edge = {'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog}}
@@ -64,10 +74,12 @@ for index, row in gene_df.iterrows():
     if ortholog not in nodes_set:
         # TODO not entirely sure this will work, since multiple genes can have single ortholog
         nodes_set.add(ortholog)
-
-    nodes.append(cy_ortholog)
+        nodes.append(cy_ortholog)
 
     edges.append(cy_edge)
+
+    count_n += 1
+
 
 #########################
 #        Graph          #
@@ -82,22 +94,29 @@ graph_stylesheet = [
             'width': '4',
             'height': '4',
             'font-size': '2px',
+            #'colour': 'data(organism)'
         }
     },
     {
-        'selector':'edges',
+        'selector': 'edges',
         'style': {
             'width': '0.25',
             'line-color': 'grey'
         }
     },
-    {
-        'selector': '.red',
-        'style': {
-            'background-color': 'red',
-            'line-color': 'red'
-        }
-    },
+    # {
+    #     'selector': '.red',
+    #     'style': {
+    #         'background-color': 'red',
+    #         'line-color': 'red'
+    #     }
+    # },
+    # TODO work on this
+    #  {
+    #     'selector': '["organism" *= "dmelanogaster"]',
+    #     'background-color': '#FF4136',
+    #     'line-colour': '#FF4136',
+    # },
     {
         'selector': '.blue',
         'style': {
