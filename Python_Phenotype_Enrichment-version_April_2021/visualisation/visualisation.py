@@ -65,33 +65,45 @@ for index, row in gene_df.iterrows():
 
     # ortholog node
     # randomize left or right side position of node
-    # TODO store pos_x and pos_y of ortholog nodes in list/dict and when assigning new locations, check if it is not taken already
 
-    if bool(random.getrandbits(1)) is True:
-        pos_x = random.randint(0, 45)
-    else:
-        pos_x = random.randint(55, 100)
+    def check_x_position(position_list):
+        """ Creates x coordinate (position) for a node using randomisation.
+        Checks if created x coordinate if present in provided position list.
+        If it is, function is recursively called back.
+        Finally, it appends x coordinate to the list
+        :param position_list: list storing all x coordintaes (positions) of nodes
+         """
+        if bool(random.getrandbits(1)) is True:
+            pos_x_ort = random.randint(0, 45)
+        else:
+            pos_x_ort = random.randint(55, 100)
+        if pos_x_ort in position_list:
+            check_x_position(position_list)
+        else:
+            position_list.append(pos_x_ort)
+        return pos_x_ort
 
 
-    def check_position(position_list, position_float):
-        """ Checks if node position is already present in list of positions
+    def check_y_position(position_list, position_float):
+        """ Checks if node y coordinate (position) is already present in list of positions
         If it is not true, the position is returned and added to the list of positions
         otherwise, the function is called upon itself.
 
-        :param position_list: list where the positions are stored
-        :param position_float: the position of relate gene node
+        :param position_list: list where the non-overlapping positions are stored
+        :param position_float: the y coordinate (position) of related gene node
         """
         position = position_float + random.randint(0, 2)
         if position not in position_list:
             position_list.append(position)
-            return position
         else:
-            check_position(position_list, position_float)
+            check_y_position(position_list, position_float)
+        return position
 
-    pos_y_ortholog = check_position(y_all, pos_y)  # call the function
+    pos_x_ortholog = check_x_position(x_all)
+    pos_y_ortholog = check_y_position(y_all, pos_y)  # call the function
 
     cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'organism': organism}, 'classes': 'red',
-                   'position': {'x': pos_x, 'y': pos_y_ortholog}}
+                   'position': {'x': pos_x_ortholog, 'y': pos_y_ortholog}}
     cy_edge = {'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog}}
 
     # add genes and orthologs to set nodes and cy nodes
