@@ -6,21 +6,18 @@
 
 """
 # TODO get rid of Nan nodes
-# TODO import phenotypes as a different type of nodes, add it to nodes set+ cy nodes
 # TODO specify allowed locations of the nodes (eg genes in the middle of page)
-# TODO play with the layouts (I don't like grids)
+# TODO you need to check x and y positon at the same time!
 
 # Import modules
-import math
-
-import numpy
 import pandas as pd
 import dash
 import dash_cytoscape as cyto
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
-import random
+from coordinates import check_coordinates, gene_y_position
+
 
 # Load data
 df = pd.read_csv('data.csv', delimiter=',')
@@ -32,17 +29,15 @@ nodes = []
 edges = []
 nodes_set = set()  # to avoid duplication
 
-
 # get total number of genes
 N_genes = set(df['2'].tolist())
 N = len(N_genes)  # total number of genes TODO maybe do this as set
 
 # for node positions
 count_n = 1  # count for x_pos of gene nodes
-x_all_orthologs = []  # all ortholog x positions
-y_all_orthologs = []  # all ortholog y positions
-x_all_phenotypes = []
-y_all_phenotypes = []
+
+coordinates_ort = []
+coordinates_phenotype = []
 
 # Load data into nodes and edges
 for index, row in gene_df.iterrows():
@@ -51,87 +46,24 @@ for index, row in gene_df.iterrows():
     # target node is ortholog
     # TODO get rid of Nans
     ortholog = str(row['1'])
-
     phenotype = str(row['associated_phenotype'])
-
     organism = str(row['Organism'])
 
     # add data and class info to the nodes
     # gene node positions
     pos_x = 50  # always the same
-
-    def gene_y_position(y, total_genes):
-        """ Creates y coordinate of a gene node
-         Y coordinate must be placed lower on the y axis as a previous one.
-         As long as the count is lower than the total number of genes, the y position is produced.
-
-         :param y: y coordinate/position of a previous node
-         :param total_genes: the total number of genes to be visualised as nodes
-         """
-        #TODO do something about this; the highest y coordinate is quite low
-        if count_n <= total_genes:
-            #y = 500 - (count_n / total_genes)*50  # normalise count_n/N, otherwise logarithmical
-            y = (count_n / total_genes)*100
-        else:
-            pass
-        return y
-
-    pos_y = gene_y_position(1, N)
+    pos_y = gene_y_position(1, N, count_n)
 
     cy_gene = {'data': {'id': gene, 'label': gene, 'size': 4, 'fontsize': '1.5px'}, 'classes': 'blue', 'position': {'x': pos_x, 'y': pos_y}}
 
     # ortholog node
-    # randomize left or right side position of node
-
-    def check_x_position(position_list, x1, x2, x3, x4):
-        """ Creates x coordinate (position) for a node using randomisation.
-        Checks if created x coordinate if present in provided position list.
-        If it is, function is recursively called back.
-        Finally, it appends x coordinate to the list
-
-        :param position_list: list storing all x coordinates (positions) of nodes
-         """
-        if bool(random.getrandbits(1)) is True:
-            pos_x_ort = random.uniform(x1, x2)
-        else:
-            pos_x_ort = random.uniform(x3, x4)
-
-        if pos_x_ort in position_list:
-            check_x_position(position_list)
-        else:
-            position_list.append(pos_x_ort)
-            return pos_x_ort
-
-
-    def check_y_position(position_list, position_float):
-        """ Checks if node y coordinate (position) is already present in list of positions
-        If it is not true, the position is returned and added to the list of positions
-        otherwise, the function is called upon itself.
-
-        :param position_list: list where the non-overlapping positions are stored
-        :param position_float: the y coordinate (position) of related gene node
-        """
-        # since during the first iterration through df, position_float=1 and we don't wnt all to be too close
-        if position_float == 1:
-            position = random.uniform(0, 100)
-        else:
-            position = position_float + random.uniform(0, 20)
-
-        if position not in position_list:
-            position_list.append(position)
-        else:
-            check_y_position(position_list, position_float)
-        return position
-
-
-    pos_x_ortholog = check_x_position(x_all_orthologs, 20, 45, 55, 80)
-    pos_y_ortholog = check_y_position(y_all_orthologs, pos_y)  # call the function
+    pos_x_ortholog, pos_y_ortholog = check_coordinates(coordinates_ort, pos_y, 20, 45, 55, 80)
 
     cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'size': 2, 'fontsize': '1px', 'organism': organism},
                    'position': {'x': pos_x_ortholog, 'y': pos_y_ortholog}}
 
-    pos_x_phenotype = check_x_position(x_all_phenotypes, 0, 20, 80, 100)
-    pos_y_phenotype = check_y_position(y_all_phenotypes, pos_y)  # call the function
+    # phenotype node
+    pos_x_phenotype, pos_y_phenotype = check_coordinates(coordinates_phenotype, pos_y, 0, 20, 80, 100)
     # TODO add label to these nodes
     cy_phenotype = {'data': {'id': phenotype, 'size': 1, 'fontsize': '0.5px'}, 'classes': 'purple',
                     'position': {'x': pos_x_phenotype, 'y': pos_y_phenotype}}
@@ -157,11 +89,6 @@ for index, row in gene_df.iterrows():
 
     edges.append(cy_edge)
     edges.append(cy_edge_2)
-
-
-
-
-
 
 #########################
 #        Graph          #
