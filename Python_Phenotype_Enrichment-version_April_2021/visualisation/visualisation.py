@@ -51,7 +51,7 @@ for index, row in gene_df.iterrows():
 
     phenotype = str(row['associated_phenotype'])
 
-    organism = row['Organism']
+    organism = str(row['Organism'])
 
     # add data and class info to the nodes
     # gene node positions
@@ -117,7 +117,7 @@ for index, row in gene_df.iterrows():
     pos_x_ortholog = check_x_position(x_all_orthologs, 20, 45, 55, 80)
     pos_y_ortholog = check_y_position(y_all_orthologs, pos_y)  # call the function
 
-    cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'size': 2, 'fontsize': '1px', 'organism': organism}, 'classes': 'red',
+    cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'size': 2, 'fontsize': '1px', 'organism': organism},
                    'position': {'x': pos_x_ortholog, 'y': pos_y_ortholog}}
 
     pos_x_phenotype = check_x_position(x_all_phenotypes, 0, 20, 80, 100)
@@ -172,25 +172,48 @@ graph_stylesheet = [
         }
     },
     {
-        'selector': '.red',
-        'style': {
-            'background-color': 'red',
-            'line-color': 'red'
-        }
-    },
-    {
         'selector': '.purple',
         'style': {
             'background-color': 'purple',
             'line-color': 'purple'
         }
     },
-    # TODO work on this
-    #  {
-    #     'selector': '["organism" *= "dmelanogaster"]',
-    #     'background-color': '#FF4136',
-    #     'line-colour': '#FF4136',
-    # },
+    # colours based on organism
+    {
+        'selector': '[organism *= "dmelanogaster"]',
+        'style': {
+            'background-color': 'yellow',
+            'line-colour': 'yellow',
+        }
+    },
+    {
+        'selector': '[organism *= "mouse"]',
+        'style': {
+            'background-color': 'green',
+            'line-colour': 'green',
+        }
+    },
+    {
+        'selector': '[organism *= "celegans"]',
+        'style': {
+            'background-color': 'pink',
+            'line-colour': 'pink',
+        }
+    },
+    {
+        'selector': '[organism *= "zebrafish"]',
+        'style': {
+            'background-color': 'orange',
+            'line-colour': 'orange',
+        }
+    },
+    {
+        'selector': '[organism *= "slimemould"]',
+        'style': {
+            'background-color': 'brown',
+            'line-colour': 'brown',
+        }
+    },
     {
         'selector': '.blue',
         'style': {
