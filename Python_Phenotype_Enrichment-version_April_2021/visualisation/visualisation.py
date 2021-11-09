@@ -106,7 +106,7 @@ for index, row in gene_df.iterrows():
         :param position_list: list where the non-overlapping positions are stored
         :param position_float: the y coordinate (position) of related gene node
         """
-        position = position_float + random.uniform(0, 2)
+        position = position_float + random.uniform(0, 20)
         if position not in position_list:
             position_list.append(position)
         else:
