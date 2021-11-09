@@ -23,19 +23,23 @@ import dash_bootstrap_components as dbc
 import random
 
 # Load data
-gene_df = pd.read_csv('data.csv', delimiter=',')
+df = pd.read_csv('data.csv', delimiter=',')
+df_1 = df.assign(phenotype=df['associated_phenotype'].astype(str).str.split(',')).explode('phenotype')
+gene_df = df_1[['1', '2', 'Organism', 'associated_phenotype']]
 
 # make nodes and edges
 nodes = []
 edges = []
 nodes_set = set()  # to avoid duplication
 
-N = len(gene_df.index)  # total number of genes TODO maybe do this as set
+N = len(df.index)  # total number of genes TODO maybe do this as set
 
 # for node positions
 count_n = 1  # count for x_pos of gene nodes
-x_all = []
-y_all = []
+x_all_orthologs = []  # all ortholog x positions
+y_all_orthologs = []  # all ortholog y positions
+x_all_phenotypes = []
+y_all_phenotypes = []
 
 # Load data into nodes and edges
 for index, row in gene_df.iterrows():
@@ -43,45 +47,43 @@ for index, row in gene_df.iterrows():
     gene = str(row['2'])
     # target node is ortholog
     # TODO get rid of Nans
-    ortholog_all = row['1']
-    if not ortholog_all == ["FBgn0003513"]:
-        ortholog = str(ortholog_all)
-    # TODO add phenotype nodes
+    ortholog = str(row['1'])
 
-    phenotype = row['associated_phenotype']
+    phenotype = str(row['associated_phenotype'])
+
     organism = row['Organism']
 
     # add data and class info to the nodes
-    # gene node
-    # position
+    # gene node positions
     pos_x = 50
-    pos_y = 1  # intialise outside if/else block
+    pos_y = 1  # initialise outside if/else block
     if count_n <= N:
-        pos_y = 1000 - numpy.log(count_n / N) * 50  # normalise count_n/N, otherwise logarithmical
+        pos_y = 1000 - math.log(count_n / N) * 25  # normalise count_n/N, otherwise logarithmical
     else:
         print("something went wrong")
 
-    cy_gene = {'data': {'id': gene, 'label': gene}, 'classes': 'blue', 'position': {'x': pos_x, 'y': pos_y}}
+    cy_gene = {'data': {'id': gene, 'label': gene, 'size': 4, 'fontsize': '1.5px'}, 'classes': 'blue', 'position': {'x': pos_x, 'y': pos_y}}
 
     # ortholog node
     # randomize left or right side position of node
 
-    def check_x_position(position_list):
+    def check_x_position(position_list, x1, x2, x3, x4):
         """ Creates x coordinate (position) for a node using randomisation.
         Checks if created x coordinate if present in provided position list.
         If it is, function is recursively called back.
         Finally, it appends x coordinate to the list
-        :param position_list: list storing all x coordintaes (positions) of nodes
+        :param position_list: list storing all x coordinates (positions) of nodes
          """
         if bool(random.getrandbits(1)) is True:
-            pos_x_ort = random.randint(0, 45)
+            pos_x_ort = random.uniform(x1, x2)
         else:
-            pos_x_ort = random.randint(55, 100)
+            pos_x_ort = random.uniform(x3, x4)
+
         if pos_x_ort in position_list:
             check_x_position(position_list)
         else:
             position_list.append(pos_x_ort)
-        return pos_x_ort
+            return pos_x_ort
 
 
     def check_y_position(position_list, position_float):
@@ -92,34 +94,47 @@ for index, row in gene_df.iterrows():
         :param position_list: list where the non-overlapping positions are stored
         :param position_float: the y coordinate (position) of related gene node
         """
-        position = position_float + random.randint(0, 2)
+        position = position_float + random.uniform(0, 2)
         if position not in position_list:
             position_list.append(position)
         else:
             check_y_position(position_list, position_float)
         return position
 
-    pos_x_ortholog = check_x_position(x_all)
-    pos_y_ortholog = check_y_position(y_all, pos_y)  # call the function
 
-    cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'organism': organism}, 'classes': 'red',
+    pos_x_ortholog = check_x_position(x_all_orthologs, 20, 45, 55, 80)
+    pos_y_ortholog = check_y_position(y_all_orthologs, pos_y)  # call the function
+
+    cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'size': 2, 'fontsize': '1px', 'organism': organism}, 'classes': 'red',
                    'position': {'x': pos_x_ortholog, 'y': pos_y_ortholog}}
-    cy_edge = {'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog}}
+
+    pos_x_phenotype = check_x_position(x_all_phenotypes, 0, 20, 80, 100)
+    pos_y_phenotype = check_y_position(y_all_phenotypes, pos_y)  # call the function
+    # TODO add label to these nodes
+    cy_phenotype = {'data': {'id': phenotype, 'size': 1, 'fontsize': '0.5px'}, 'classes': 'purple',
+                    'position': {'x': pos_x_phenotype, 'y': pos_y_phenotype}}
+
+    cy_edge = {'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog, 'width': '0.25'}}
+    cy_edge_2 = {'data': {'id': ortholog + phenotype, 'source': ortholog, 'target': phenotype, 'width': '0.10'}}
 
     # add genes and orthologs to set nodes and cy nodes
     if gene not in nodes_set:
         nodes_set.add(gene)
         nodes.append(cy_gene)
+        count_n += 1
 
     if ortholog not in nodes_set:
         # TODO not entirely sure this will work, since multiple genes can have single ortholog
+        # it should, since this does not affect the edges
         nodes_set.add(ortholog)
         nodes.append(cy_ortholog)
 
+    if phenotype not in nodes_set:
+        nodes_set.add(phenotype)
+        nodes.append(cy_phenotype)
+
     edges.append(cy_edge)
-
-    count_n += 1
-
+    edges.append(cy_edge_2)
 
 #########################
 #        Graph          #
@@ -131,26 +146,33 @@ graph_stylesheet = [
         'selector': 'nodes',
         'style': {
             'content': 'data(label)',
-            'width': '4',
-            'height': '4',
-            'font-size': '2px',
+            'width': 'data(size)',
+            'height': 'data(size)',
+            'font-size': 'data(fontsize)',
             # 'colour': 'data(organism)'
         }
     },
     {
         'selector': 'edges',
         'style': {
-            'width': '0.25',
+            'width': 'data(width)',
             'line-color': 'grey'
         }
     },
-    # {
-    #     'selector': '.red',
-    #     'style': {
-    #         'background-color': 'red',
-    #         'line-color': 'red'
-    #     }
-    # },
+    {
+        'selector': '.red',
+        'style': {
+            'background-color': 'red',
+            'line-color': 'red'
+        }
+    },
+    {
+        'selector': '.purple',
+        'style': {
+            'background-color': 'purple',
+            'line-color': 'purple'
+        }
+    },
     # TODO work on this
     #  {
     #     'selector': '["organism" *= "dmelanogaster"]',
