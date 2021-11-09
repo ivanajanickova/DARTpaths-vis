@@ -55,12 +55,23 @@ for index, row in gene_df.iterrows():
 
     # add data and class info to the nodes
     # gene node positions
-    pos_x = 50
-    pos_y = 1  # initialise outside if/else block
-    if count_n <= N:
-        pos_y = 1000 - math.log(count_n / N) * 25  # normalise count_n/N, otherwise logarithmical
-    else:
-        print("something went wrong")
+    pos_x = 50  # always the same
+
+    def gene_y_position(y, total_genes):
+        """ Creates y coordinate of a gene node
+         Y coordinate must be placed lower on the y axis as a previous one.
+         As long as the count is lower than the total number of genes, the y position is produced.
+
+         :param y: y coordinate/position of a previous node
+         :param total_genes: the total number of genes to be visualised as nodes
+         """
+        if count_n <= total_genes:
+            y = 1000 - math.log(count_n / total_genes) * 25  # normalise count_n/N, otherwise logarithmical
+        else:
+            print("something went wrong")
+        return y
+
+    pos_y = gene_y_position(1, N)
 
     cy_gene = {'data': {'id': gene, 'label': gene, 'size': 4, 'fontsize': '1.5px'}, 'classes': 'blue', 'position': {'x': pos_x, 'y': pos_y}}
 
@@ -72,6 +83,7 @@ for index, row in gene_df.iterrows():
         Checks if created x coordinate if present in provided position list.
         If it is, function is recursively called back.
         Finally, it appends x coordinate to the list
+
         :param position_list: list storing all x coordinates (positions) of nodes
          """
         if bool(random.getrandbits(1)) is True:
@@ -135,7 +147,7 @@ for index, row in gene_df.iterrows():
 
     edges.append(cy_edge)
     edges.append(cy_edge_2)
-
+    # TODO figure out why not all edges show
 #########################
 #        Graph          #
 #########################
