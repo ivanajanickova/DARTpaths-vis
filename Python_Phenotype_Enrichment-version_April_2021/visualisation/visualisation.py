@@ -70,7 +70,8 @@ for index, row in gene_df.iterrows():
          """
         #TODO do something about this; the highest y coordinate is quite low
         if count_n <= total_genes:
-            y = 500 - (count_n / total_genes)*50  # normalise count_n/N, otherwise logarithmical
+            #y = 500 - (count_n / total_genes)*50  # normalise count_n/N, otherwise logarithmical
+            y = (count_n / total_genes)*100
         else:
             pass
         return y
@@ -112,7 +113,7 @@ for index, row in gene_df.iterrows():
         """
         # since during the first iterration through df, position_float=1 and we don't wnt all to be too close
         if position_float == 1:
-            position = random.uniform(425, 500)
+            position = random.uniform(0, 100)
         else:
             position = position_float + random.uniform(0, 20)
 
