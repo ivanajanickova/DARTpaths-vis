@@ -32,7 +32,10 @@ nodes = []
 edges = []
 nodes_set = set()  # to avoid duplication
 
-N = len(df.index)  # total number of genes TODO maybe do this as set
+
+# get total number of genes
+N_genes = set(df['2'].tolist())
+N = len(N_genes)  # total number of genes TODO maybe do this as set
 
 # for node positions
 count_n = 1  # count for x_pos of gene nodes
@@ -65,10 +68,11 @@ for index, row in gene_df.iterrows():
          :param y: y coordinate/position of a previous node
          :param total_genes: the total number of genes to be visualised as nodes
          """
+        #TODO do something about this; the highest y coordinate is quite low
         if count_n <= total_genes:
-            y = 1000 - math.log(count_n / total_genes) * 25  # normalise count_n/N, otherwise logarithmical
+            y = 500 - (count_n / total_genes)*50  # normalise count_n/N, otherwise logarithmical
         else:
-            print("something went wrong")
+            pass
         return y
 
     pos_y = gene_y_position(1, N)
@@ -106,7 +110,12 @@ for index, row in gene_df.iterrows():
         :param position_list: list where the non-overlapping positions are stored
         :param position_float: the y coordinate (position) of related gene node
         """
-        position = position_float + random.uniform(0, 20)
+        # since during the first iterration through df, position_float=1 and we don't wnt all to be too close
+        if position_float == 1:
+            position = random.uniform(425, 500)
+        else:
+            position = position_float + random.uniform(0, 20)
+
         if position not in position_list:
             position_list.append(position)
         else:
@@ -147,7 +156,12 @@ for index, row in gene_df.iterrows():
 
     edges.append(cy_edge)
     edges.append(cy_edge_2)
-    # TODO figure out why not all edges show
+
+
+
+
+
+
 #########################
 #        Graph          #
 #########################
