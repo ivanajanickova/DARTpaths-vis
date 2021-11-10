@@ -9,6 +9,7 @@
 # TODO specify allowed locations of the nodes (eg genes in the middle of page)
 
 # Import modules
+from time import perf_counter
 import pandas as pd
 import dash
 import dash_cytoscape as cyto
@@ -17,6 +18,7 @@ from dash import html
 import dash_bootstrap_components as dbc
 from coordinates import check_coordinates, gene_y_coordinate
 
+sdk_start_time = perf_counter()
 
 # Load data
 df = pd.read_csv('data.csv', delimiter=',')
@@ -51,7 +53,7 @@ for index, row in gene_df.iterrows():
 
     # add data and class info to the nodes
     # gene node positions
-    pos_x = 50  # always the same
+    pos_x = 50  # always the same; set to 500 in case of large network
     pos_y = gene_y_coordinate(1, N, count_n)
 
     cy_gene = {'data': {'id': gene, 'label': gene, 'size': 4, 'fontsize': '1.5px'}, 'classes': 'blue', 'position': {'x': pos_x, 'y': pos_y}}
@@ -64,7 +66,7 @@ for index, row in gene_df.iterrows():
 
     # phenotype node
     pos_x_phenotype, pos_y_phenotype = check_coordinates(coordinates_phenotype, pos_y, 0, 20, 80, 100)
-    # TODO add label to these nodes
+    # TODO add label to these nodes - ALEX will do this
     cy_phenotype = {'data': {'id': phenotype, 'size': 1, 'fontsize': '0.5px'}, 'classes': 'purple',
                     'position': {'x': pos_x_phenotype, 'y': pos_y_phenotype}}
 
@@ -173,6 +175,7 @@ node_graph = dbc.Row([
             cyto.Cytoscape(
                 id='cytoscape-phenotype',
                 layout={'name': 'preset'},
+                # layout={'name': 'cose'},
                 elements=edges + nodes,
                 stylesheet=graph_stylesheet,
                 style={'width': '100%', 'height': '95vh'},
@@ -196,5 +199,8 @@ window = html.Div(
 # run app
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.layout = html.Div([dcc.Location(id="url"), window])
+end_time = perf_counter()
+print("\nElapsed time: " + str(end_time - sdk_start_time) + "s")  # get run time
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)  # set false so you can load bigger networks
+
