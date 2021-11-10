@@ -49,7 +49,7 @@ def check_coordinates(coordinates, coordinate_float, x1, x2, x3, x4):
     if coordinate_float == 1:
         y_coordinate = random.uniform(0, 100)
     else:
-        y_coordinate = coordinate_float + random.uniform(0, 20)
+        y_coordinate = coordinate_float + random.uniform(0, 50)
 
     coordinate = (x_coordinate, y_coordinate)
 

@@ -116,8 +116,8 @@ graph_stylesheet = [
     {
         'selector': '.purple',
         'style': {
-            'background-color': 'purple',
-            'line-color': 'purple'
+            'background-color': '#C918F3',
+            'line-color': '#C918F3'
         }
     },
     # colours based on organism
@@ -159,8 +159,8 @@ graph_stylesheet = [
     {
         'selector': '.blue',
         'style': {
-            'background-color': 'blue',
-            'line-color': 'blue'
+            'background-color': '#18B6F3',
+            'line-color': '#18B6F3'
         }
     }
 
