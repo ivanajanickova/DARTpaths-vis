@@ -7,7 +7,6 @@
 """
 # TODO get rid of Nan nodes
 # TODO specify allowed locations of the nodes (eg genes in the middle of page)
-# TODO you need to check x and y positon at the same time!
 
 # Import modules
 import pandas as pd
@@ -16,13 +15,14 @@ import dash_cytoscape as cyto
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
-from coordinates import check_coordinates, gene_y_position
+from coordinates import check_coordinates, gene_y_coordinate
 
 
 # Load data
 df = pd.read_csv('data.csv', delimiter=',')
 df_1 = df.assign(phenotype=df['associated_phenotype'].astype(str).str.split(',')).explode('phenotype')
-gene_df = df_1[['1', '2', 'Organism', 'associated_phenotype']]
+gene_df = df_1[['1', '2', 'Organism', 'phenotype']]
+
 
 # make nodes and edges
 nodes = []
@@ -46,13 +46,13 @@ for index, row in gene_df.iterrows():
     # target node is ortholog
     # TODO get rid of Nans
     ortholog = str(row['1'])
-    phenotype = str(row['associated_phenotype'])
+    phenotype = str(row['phenotype'])
     organism = str(row['Organism'])
 
     # add data and class info to the nodes
     # gene node positions
     pos_x = 50  # always the same
-    pos_y = gene_y_position(1, N, count_n)
+    pos_y = gene_y_coordinate(1, N, count_n)
 
     cy_gene = {'data': {'id': gene, 'label': gene, 'size': 4, 'fontsize': '1.5px'}, 'classes': 'blue', 'position': {'x': pos_x, 'y': pos_y}}
 
@@ -175,7 +175,7 @@ node_graph = dbc.Row([
                 layout={'name': 'preset'},
                 elements=edges + nodes,
                 stylesheet=graph_stylesheet,
-                style={'width': '90%', 'height': '95vh'},
+                style={'width': '100%', 'height': '95vh'},
 
                 responsive=True  # Changes size cystocape graph is browser window changes size
             )
