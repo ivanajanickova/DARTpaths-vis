@@ -68,8 +68,8 @@ for index, row in gene_df.iterrows():
     cy_phenotype = {'data': {'id': phenotype, 'size': 1, 'fontsize': '0.5px'}, 'classes': 'purple',
                     'position': {'x': pos_x_phenotype, 'y': pos_y_phenotype}}
 
-    cy_edge = {'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog, 'width': '0.25'}}
-    cy_edge_2 = {'data': {'id': ortholog + phenotype, 'source': ortholog, 'target': phenotype, 'width': '0.10'}}
+    cy_edge = {'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog, 'width': '0.25', 'color':'#696969'}}
+    cy_edge_2 = {'data': {'id': ortholog + phenotype, 'source': ortholog, 'target': phenotype, 'width': '0.10', 'color':'#B8B8B8'}}
 
     # add genes and orthologs to set nodes and cy nodes
     if gene not in nodes_set:
@@ -110,7 +110,7 @@ graph_stylesheet = [
         'selector': 'edges',
         'style': {
             'width': 'data(width)',
-            'line-color': 'grey'
+            'line-color': 'data(color)',
         }
     },
     {
