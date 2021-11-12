@@ -6,7 +6,6 @@
 
 """
 # TODO get rid of Nan nodes
-# TODO specify allowed locations of the nodes (eg genes in the middle of page)
 
 # Import modules
 from time import perf_counter
@@ -20,77 +19,114 @@ from coordinates import check_coordinates, gene_y_coordinate
 
 sdk_start_time = perf_counter()
 
-# Load data
-df = pd.read_csv('data.csv', delimiter=',')
-df_1 = df.assign(phenotype=df['associated_phenotype'].astype(str).str.split(',')).explode('phenotype')
-gene_df = df_1[['1', '2', 'Organism', 'phenotype']]
+# specify paths to files you want to visualise
+# path relative to visualisation.py is enough
+df_path = 'pathway_data/AHR.csv'
+df_path_2 = 'pathway_data/AmineOxidase.csv'
 
 
-# make nodes and edges
-nodes = []
-edges = []
-nodes_set = set()  # to avoid duplication
+def load_dataframe(pathway: str):
+    """ Function to load information from input csv file to pandas dataframe.
+    It returns dataframe with loaded information and the total number of unique human genes
+    in the dataframe as integer.
 
-# get total number of genes
-N_genes = set(df['2'].tolist())
-N = len(N_genes)  # total number of genes TODO maybe do this as set
+    :param pathway: relative pathway to input .csv file
+    """
+    df = pd.read_csv(pathway, delimiter=',')
+    df_1 = df.assign(phenotype=df['associated_phenotype'].astype(str).str.split(',')).explode('phenotype')
+    df_2 = df_1[['1', '2', 'Organism', 'phenotype']]
+    df_3 = df_2[:-1]
 
-# for node positions
-count_n = 1  # count for x_pos of gene nodes
+    # get total number of genes
+    n_genes = set(df['2'].tolist())
+    n = len(n_genes)  # total number of genes
 
-coordinates_ort = []
-coordinates_phenotype = []
+    return df_3, n
 
-# Load data into nodes and edges
-for index, row in gene_df.iterrows():
-    # source node is human gene
-    gene = str(row['2'])
-    # target node is ortholog
-    # TODO get rid of Nans
-    ortholog = str(row['1'])
-    phenotype = str(row['phenotype'])
-    organism = str(row['Organism'])
 
-    # add data and class info to the nodes
-    # gene node positions
-    pos_x = 50  # always the same; set to 500 in case of large network
-    pos_y = gene_y_coordinate(1, N, count_n)
+def load_info_to_graph(dataframe: pd.DataFrame, n_genes: int):
+    """ Function used to extract information from dataframe and load it into
+    nodes and edges list of dictionaries
 
-    cy_gene = {'data': {'id': gene, 'label': gene, 'size': 4, 'fontsize': '1.5px'}, 'classes': 'blue', 'position': {'x': pos_x, 'y': pos_y}}
+    :param dataframe: dataframe with information about nodes and edges
+    :param n_genes: number of unique genes, necessary for y position determination
+    """
 
-    # ortholog node
-    pos_x_ortholog, pos_y_ortholog = check_coordinates(coordinates_ort, pos_y, 20, 45, 55, 80)
+    # make nodes and edges
+    nodes_list = []
+    edges_list = []
+    nodes_set = set()  # to avoid duplication
 
-    cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'size': 2, 'fontsize': '1px', 'organism': organism},
-                   'position': {'x': pos_x_ortholog, 'y': pos_y_ortholog}}
+    # for node positions
+    count_n = 1  # count for x_pos of gene nodes
+    coordinates_ort = []
+    coordinates_phenotype = []
 
-    # phenotype node
-    pos_x_phenotype, pos_y_phenotype = check_coordinates(coordinates_phenotype, pos_y, 0, 20, 80, 100)
-    # TODO add label to these nodes - ALEX will do this
-    cy_phenotype = {'data': {'id': phenotype, 'size': 1, 'fontsize': '0.5px'}, 'classes': 'purple',
-                    'position': {'x': pos_x_phenotype, 'y': pos_y_phenotype}}
+    # Load data into nodes and edges
+    for index, row in dataframe.iterrows():
+        # source node is human gene
+        gene = str(row['2'])
+        # target node is ortholog
+        ortholog = str(row['1'])
+        phenotype = str(row['phenotype'])
 
-    cy_edge = {'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog, 'width': '0.25', 'color':'#696969'}}
-    cy_edge_2 = {'data': {'id': ortholog + phenotype, 'source': ortholog, 'target': phenotype, 'width': '0.10', 'color':'#B8B8B8'}}
+        organism = str(row['Organism'])
 
-    # add genes and orthologs to set nodes and cy nodes
-    if gene not in nodes_set:
-        nodes_set.add(gene)
-        nodes.append(cy_gene)
-        count_n += 1
+        # add data and class info to the nodes
+        # gene node positions
+        pos_x = 50  # always the same; set to 500 in case of large network
+        pos_y = gene_y_coordinate(1, n_genes, count_n)
 
-    if ortholog not in nodes_set:
-        # TODO not entirely sure this will work, since multiple genes can have single ortholog
-        # it should, since this does not affect the edges
-        nodes_set.add(ortholog)
-        nodes.append(cy_ortholog)
+        cy_gene = {'data': {'id': gene, 'label': gene, 'size': 4, 'fontsize': '1.5px'}, 'classes': 'blue',
+                   'position': {'x': pos_x, 'y': pos_y}}
 
-    if phenotype not in nodes_set:
-        nodes_set.add(phenotype)
-        nodes.append(cy_phenotype)
+        # ortholog node
+        pos_x_ortholog, pos_y_ortholog = check_coordinates(coordinates_ort, pos_y, 20, 45, 55, 80)
 
-    edges.append(cy_edge)
-    edges.append(cy_edge_2)
+        cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'size': 2, 'fontsize': '1px', 'organism': organism},
+                       'position': {'x': pos_x_ortholog, 'y': pos_y_ortholog}}
+        cy_edge = {
+            'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog, 'width': '0.25', 'color': '#696969'}}
+
+        # add genes and orthologs to set nodes and cy nodes
+        if gene not in nodes_set:
+            nodes_set.add(gene)
+            nodes_list.append(cy_gene)
+            count_n += 1
+
+        if ortholog not in nodes_set:
+            # TODO not entirely sure this will work, since multiple genes can have single ortholog
+            # it should, since this does not affect the edges
+            nodes_set.add(ortholog)
+            nodes_list.append(cy_ortholog)
+
+        edges_list.append(cy_edge)
+
+        # phenotype node
+        pos_x_phenotype, pos_y_phenotype = check_coordinates(coordinates_phenotype, pos_y, 0, 20, 80, 100)
+
+        if phenotype != "nan":
+            # remove "nan" phenotype
+            cy_phenotype = {'data': {'id': phenotype, 'label': phenotype, 'size': 1, 'fontsize': '0.5px'}, 'classes': 'purple',
+                            'position': {'x': pos_x_phenotype, 'y': pos_y_phenotype}}
+            cy_edge_2 = {'data': {'id': ortholog + phenotype, 'source': ortholog, 'target': phenotype, 'width': '0.10',
+                                  'color': '#B8B8B8'}}
+
+            if phenotype not in nodes_set:
+                nodes_set.add(phenotype)
+                nodes_list.append(cy_phenotype)
+
+            edges_list.append(cy_edge_2)
+
+    return nodes_list, edges_list
+
+
+gene_df, N_genes = load_dataframe(df_path)
+
+gene_df_2, N_genes_2 = load_dataframe(df_path_2)
+
+# nodes, edges = load_info_to_graph(gene_df_2, N_genes_2)
+nodes, edges = load_info_to_graph(gene_df, N_genes)
 
 #########################
 #        Graph          #
