@@ -1,25 +1,51 @@
-import preprocessing
-import os
+import db_retrieve
 
-# this file is just for demonstration you can delete it once you understand the output
-# FIRSTLY RUN THE ENRICHMENT SCRIPT FOR THE PATHWAY !!!!
+#######################################################################################################################
+# Interface for retrieving the data from DB ###########################################################################
+#######################################################################################################################
 
-# get dataframe for a given pathway
-dataframe = preprocessing.get_combined_df(str(os.getcwd()) + "/AHR_R-HSA-8937144_Enrichment_Results")
-print(dataframe)
+# THIS SCRIPT IS JUST FOR DEMONSTRATION
 
-# get the name of the phenotype id
-name_1 = preprocessing.get_phenotype_name("MP:0005377")
-print(name_1)
-# get the list of related phenotypes 
-list_of_related_phenotypes_1 = preprocessing.get_related_phenotypes("MP:0005377")
-print(list_of_related_phenotypes_1)
-print([preprocessing.get_phenotype_name(phen) for phen in preprocessing.get_related_phenotypes("MP:0005377")])
-# get the name of the phenotype id
-name_2 = preprocessing.get_phenotype_name("WBPhenotype:0000625")
-print(name_2)
-# get the list of related phenotypes
-list_of_related_phenotypes_2 = preprocessing.get_related_phenotypes("WBPhenotype:0000625")
-print(list_of_related_phenotypes_2)
-print([preprocessing.get_phenotype_name(phen) for phen in preprocessing.get_related_phenotypes("WBPhenotype:0000625")])
+##########################
+# Retrieve from DB #######
+##########################
+# Retrieve a dataframe of genes orthologs and enriched phenotypes for a given pathway
+# The list of pathways we have so far:
+# AmineOxidase
+# Phase2ConjugationOfCompounds
+# Phase1CompundFunctionalization
+# AminoAcidConjugation
+# EthanolOxidation
+# AHR
 
+df = db_retrieve.select_from_enrichment_results("AmineOxidase")
+print(df)
+
+# Retrieve phenotype metadata
+metadata = db_retrieve.select_from_metadata("AmineOxidase")
+print(metadata)
+
+# Retrieve the name of the higher level pathway
+name = db_retrieve.find_top_level_pathway("AmineOxidase")
+name = name[0][0]
+print(name)  # print pure string
+
+# You can then analogously retrieve info for the higher level data
+df_2 = db_retrieve.select_from_enrichment_results(name)
+print(df_2)
+
+############################
+# Get Phenotype Metadata ###
+############################
+# retrieve data for a phenotype - If the phenotype data are 'nice' - such as for c. elegans
+# 'Nice' means that the database in the preprocessing contained name of phenotype & list of related phenotypes
+random_phenotype_list = df.iloc[1300, 3]
+for random_phenotype in random_phenotype_list:
+    print(random_phenotype)
+    print(metadata.get(random_phenotype))
+
+# retrieve data retrieve data for a phenotype - If the phenotype data are 'nice' - such as for d. meganogaster
+random_phenotype_list = df.iloc[3, 3]
+for random_phenotype in random_phenotype_list:
+    print(random_phenotype)
+    print(metadata.get(random_phenotype))
