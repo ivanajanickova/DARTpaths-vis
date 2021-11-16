@@ -46,11 +46,15 @@ pd.options.mode.chained_assignment = None  # no warning message when working on 
 try:
     pathID = str(sys.argv[1])  # example: R-HSA-8937144
     pathway_name = str(sys.argv[2])  # example: "AHR" or AHR
-    path_root = sys.argv[3]  # example $HOME/DARTpaths/
+    top_level_pathway_name = str(sys.argv[3])
+    path_root = sys.argv[4]  # example $HOME/DARTpaths/
 except IndexError:
     # raise error if no input
     print("You need to provide valid input")
     sys.exit(1)  # abort execution
+
+preprocessing_obj.pathway_name = pathway_name
+preprocessing_obj.top_level_pathway_name = top_level_pathway_name
 
 # Path definitions
 
@@ -99,7 +103,7 @@ http = urllib3.PoolManager()
 # Self-update/download of Data Resources
 # Orhtologs+Phenotypes+Ontology by species (each species has personalized data files/inputs)
 
-organism_list = ["celegans", "zebrafish", "mouse", "slimemould", "dmelanogaster"]  # organisms that we will check
+organism_list = ["celegans", "zebrafish", "mouse", "dmelanogaster"]  # organisms that we will check
 for organism in organism_list:
     # for every organism in the list, check and update all the different database sources
 
@@ -556,7 +560,6 @@ def loadNewOrtholog(organism):
 
 def selectPathway(reactomefile):
     pathway = []
-
     for line in reactomefile:
         if re.search(pathID, line):
             stripped_line = line.strip()
@@ -875,6 +878,7 @@ def Enrichment(organism, genes, phenotypes):
             sigenrichment['Overlap Genes'] = [','.join(map(str, l)) for l in sigenrichment['Genes']]
             sigenrichment = sigenrichment.drop(columns=['Genes'])
 
+    preprocessing_obj.add_metadata(sigenrichment)
     return sigenrichment, overlapgenes
 
 
@@ -1080,5 +1084,5 @@ def runSummary():
 runSummary()
 
 preprocessing_obj.filter_phenotypes()
-preprocessing_obj.save_data_to_files()
+preprocessing_obj.save_data_to_db()
 

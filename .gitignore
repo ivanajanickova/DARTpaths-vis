@@ -16,3 +16,9 @@
 /DARTpaths/software/ncbi-blast-2.12.0+/
 /DARTpaths/software/hmmer-3.3.1/
 /DARTpaths/software/Notung-2.9.1.5/
+
+# phenotype enrichment results
+/Python_Phenotype_Enrichment-version_April_2021/AHR_R-HSA-8937144_Enrichment_Results/
+/Python_Phenotype_Enrichment-version_April_2021/ontology_data/
+/Python_Phenotype_Enrichment-version_April_2021/Phase1CompundFunctionalization_R-HSA-211945_Enrichment_Results/
+/Python_Phenotype_Enrichment-version_April_2021/AHR_R-HSA-8937144_Enrichment_Results/
