@@ -5,8 +5,6 @@
 ;===================================================================================================
 
 """
-# TODO get rid of Nan nodes
-
 # Import modules
 from time import perf_counter
 import pandas as pd
@@ -15,40 +13,34 @@ import dash_cytoscape as cyto
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
-from coordinates import check_coordinates, gene_y_coordinate
+
+import coordinates
+from Python_Phenotype_Enrichment_version_April_2021 import db_retrieve
 
 sdk_start_time = perf_counter()
 
-# specify paths to files you want to visualise
-# path relative to visualisation.py is enough
-df_path = 'pathway_data/AHR.csv'
-df_path_2 = 'pathway_data/AmineOxidase.csv'
 
+def expand_dataframe(df: pd.DataFrame):
+    """Function to expand dataframe, so each phenotype is in a separate row.
+    Returns new dataframe and the total number of genes
 
-def load_dataframe(pathway: str):
-    """ Function to load information from input csv file to pandas dataframe.
-    It returns dataframe with loaded information and the total number of unique human genes
-    in the dataframe as integer.
-
-    :param pathway: relative pathway to input .csv file
+    :param df: dataframe to expand
     """
-    df = pd.read_csv(pathway, delimiter=',')
-    df_1 = df.assign(phenotype=df['associated_phenotype'].astype(str).str.split(',')).explode('phenotype')
-    df_2 = df_1[['1', '2', 'Organism', 'phenotype']]
-    df_3 = df_2[:-1]
-
+    df_1 = df.assign(phenotype=df['Enriched_Phenotypes'].astype(str).str.split(',')).explode('Enriched_Phenotypes')
+    df_2 = df_1[['Orthlog_Genes', 'Human_Gene', 'Organism', 'Enriched_Phenotypes']]
     # get total number of genes
-    n_genes = set(df['2'].tolist())
+    n_genes = set(df['Human_Gene'].tolist())
     n = len(n_genes)  # total number of genes
 
-    return df_3, n
+    return df_2, n
 
 
-def load_info_to_graph(dataframe: pd.DataFrame, n_genes: int):
+def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes: int):
     """ Function used to extract information from dataframe and load it into
-    nodes and edges list of dictionaries
+    nodes and edges list of dictionaries. For phenotype nodes, metadata is added as well
 
     :param dataframe: dataframe with information about nodes and edges
+    :param metadata: dataframe with metadata of given pathway
     :param n_genes: number of unique genes, necessary for y position determination
     """
 
@@ -65,23 +57,23 @@ def load_info_to_graph(dataframe: pd.DataFrame, n_genes: int):
     # Load data into nodes and edges
     for index, row in dataframe.iterrows():
         # source node is human gene
-        gene = str(row['2'])
+        gene = str(row['Human_Gene'])
         # target node is ortholog
-        ortholog = str(row['1'])
-        phenotype = str(row['phenotype'])
+        ortholog = str(row['Orthlog_Genes'])
+        phenotype = str(row['Enriched_Phenotypes'])
 
         organism = str(row['Organism'])
 
         # add data and class info to the nodes
         # gene node positions
-        pos_x = 50  # always the same; set to 500 in case of large network
-        pos_y = gene_y_coordinate(1, n_genes, count_n)
+        # pos_x = 50  # always the same; set to 500 in case of large network
+        pos_x, pos_y = coordinates.gene_coordinate(1, n_genes, count_n)
 
         cy_gene = {'data': {'id': gene, 'label': gene, 'size': 4, 'fontsize': '1.5px'}, 'classes': 'blue',
                    'position': {'x': pos_x, 'y': pos_y}}
 
         # ortholog node
-        pos_x_ortholog, pos_y_ortholog = check_coordinates(coordinates_ort, pos_y, 20, 45, 55, 80)
+        pos_x_ortholog, pos_y_ortholog = coordinates.check_coordinates(coordinates_ort, pos_y, n_genes, 20, 45, 55, 80)
 
         cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'size': 2, 'fontsize': '1px', 'organism': organism},
                        'position': {'x': pos_x_ortholog, 'y': pos_y_ortholog}}
@@ -95,22 +87,21 @@ def load_info_to_graph(dataframe: pd.DataFrame, n_genes: int):
             count_n += 1
 
         if ortholog not in nodes_set:
-            # TODO not entirely sure this will work, since multiple genes can have single ortholog
-            # it should, since this does not affect the edges
             nodes_set.add(ortholog)
             nodes_list.append(cy_ortholog)
 
         edges_list.append(cy_edge)
 
-        # phenotype node
-        pos_x_phenotype, pos_y_phenotype = check_coordinates(coordinates_phenotype, pos_y, 0, 20, 80, 100)
+        if phenotype != "None": # get rid of None node
 
-        if phenotype != "nan":
-            # remove "nan" phenotype
-            cy_phenotype = {'data': {'id': phenotype, 'label': phenotype, 'size': 1, 'fontsize': '0.5px'}, 'classes': 'purple',
+            metadata_phenotype = metadata.get(phenotype)  # load metadata
+            # phenotype node
+            pos_x_phenotype, pos_y_phenotype = coordinates.check_coordinates(coordinates_phenotype, pos_y, n_genes, 0, 20, 80, 100)
+
+            cy_phenotype = {'data': {'id': phenotype, 'label': phenotype, 'metadata': metadata_phenotype, 'size': 1, 'fontsize': '0.5px'}, 'classes': 'purple',
                             'position': {'x': pos_x_phenotype, 'y': pos_y_phenotype}}
             cy_edge_2 = {'data': {'id': ortholog + phenotype, 'source': ortholog, 'target': phenotype, 'width': '0.10',
-                                  'color': '#B8B8B8'}}
+                             'color': '#B8B8B8'}}
 
             if phenotype not in nodes_set:
                 nodes_set.add(phenotype)
@@ -121,13 +112,16 @@ def load_info_to_graph(dataframe: pd.DataFrame, n_genes: int):
     return nodes_list, edges_list
 
 
-gene_df, N_genes = load_dataframe(df_path)
+# call functions
+gene_df = db_retrieve.select_from_enrichment_results("AHR")
+gene_df, N_genes = expand_dataframe(gene_df)
+# metadata1 = db_retrieve.select_from_metadata("AHR")  # load metadata
+# nodes, edges = load_info_to_graph(gene_df, metadata1, N_genes)
 
-gene_df_2, N_genes_2 = load_dataframe(df_path_2)
-
-# nodes, edges = load_info_to_graph(gene_df_2, N_genes_2)
-nodes, edges = load_info_to_graph(gene_df, N_genes)
-
+gene_df2 = db_retrieve.select_from_enrichment_results("AmineOxidase")
+gene_df_2, N_genes_2 = expand_dataframe(gene_df2)
+metadata2 = db_retrieve.select_from_metadata("AmineOxidase")
+nodes, edges = load_info_to_graph(gene_df_2, metadata2, N_genes_2)
 #########################
 #        Graph          #
 #########################
