@@ -15,7 +15,9 @@ from dash import html
 import dash_bootstrap_components as dbc
 
 import coordinates
-from Python_Phenotype_Enrichment_version_April_2021 import db_retrieve
+
+# import Phenotype_Enrichment.db_retrieve as db_retrieve
+import db_retrieve
 
 sdk_start_time = perf_counter()
 

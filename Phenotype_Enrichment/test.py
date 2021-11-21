@@ -1,4 +1,4 @@
-import db_retrieve
+from Phenotype_Enrichment.visualisation import db_retrieve
 
 #######################################################################################################################
 # Interface for retrieving the data from DB ###########################################################################
