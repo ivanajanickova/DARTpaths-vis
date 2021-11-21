@@ -74,11 +74,11 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
 
         # ortholog node
         pos_x_ortholog, pos_y_ortholog = coordinates.check_coordinates(coordinates_ort, pos_y, n_genes, 20, 45, 55, 80)
-
-        cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'size': 2, 'fontsize': '1px', 'organism': organism},
-                       'position': {'x': pos_x_ortholog, 'y': pos_y_ortholog}}
-        cy_edge = {
-            'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog, 'width': '0.25', 'color': '#696969'}}
+        if ortholog != "NaN":
+            cy_ortholog = {'data': {'id': ortholog, 'label': ortholog, 'size': 2, 'fontsize': '1px', 'organism': organism},
+            'position': {'x': pos_x_ortholog, 'y': pos_y_ortholog}}
+            cy_edge = {
+                'data': {'id': gene + ortholog, 'source': gene, 'target': ortholog, 'width': '0.25', 'color': '#696969'}}
 
         # add genes and orthologs to set nodes and cy nodes
         if gene not in nodes_set:
