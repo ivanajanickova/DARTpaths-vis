@@ -61,6 +61,7 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
         # pos_x = 50  # always the same; set to 500 in case of large network
         pos_x, pos_y = coordinates.gene_coordinate(1, n_genes, count_n)
         cy_gene = {'data': {'id': gene,
+                            'indent': 'gene',   #add
                             'label': gene,
                             'size': 4,
                             'fontsize': '1.5px'},
@@ -73,9 +74,11 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
         if ortholog != "NaN":
             cy_ortholog = {'data': {'id': ortholog,
                                     'label': ortholog,
+                                    'indent': 'ortholog', #add
                                     'size': 2,
                                     'fontsize': '1px',
                                     'organism': organism},
+                           'classes': 'ortholog', #add
                            'selectable': True,    #Allow selected
                            'position': {'x': pos_x_ortholog, 'y': pos_y_ortholog}}
             cy_edge = {
@@ -103,6 +106,7 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
 
             cy_phenotype = {'data': {'id': phenotype,
                                      'label': phenotype,
+                                     'indent': 'phenotype',
                                      'metadata': metadata_phenotype,
                                      'size': 1,
                                      'fontsize': '0.5px'},
@@ -124,15 +128,21 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
     return nodes_list, edges_list
 #--------------------------------------------
 # load data -------------------------------
-gene_df = db_retrieve.select_from_enrichment_results("AHR")               #gene_df
-gene_df, N_genes = expand_dataframe(gene_df)
+gene_df1 = db_retrieve.select_from_enrichment_results("AHR")               #gene_df1
+gene_df_1, N_genes_1 = expand_dataframe(gene_df1)
+
 gene_df2 = db_retrieve.select_from_enrichment_results("AmineOxidase")     #gene_df2
 gene_df_2, N_genes_2 = expand_dataframe(gene_df2)
 metadata2 = db_retrieve.select_from_metadata("AmineOxidase")              #metadata2
 nodes, edges = load_info_to_graph(gene_df_2, metadata2, N_genes_2)
+#element = edges + nodes
 
+#organism = ['celegans', 'zebrafish', 'mouse', 'dmelanogaster']
+organism = ['dmelanogaster','mouse','celegans','zebrafish']
+# https://plotly.com/python/discrete-color/
+col_swatch = [px.colors.qualitative.Safe[8], px.colors.qualitative.Set1[2],
+              px.colors.qualitative.Set1[7],px.colors.qualitative.Set1[4]]
 
-organism = ['celegans', 'zebrafish', 'mouse', 'dmelanogaster']
 # calculate the right phenotype number
 no_celegans = (gene_df_2.groupby(['Organism']).count())['Enriched_Phenotypes'][0]
 no_dmelanogaster = (gene_df_2.groupby(['Organism']).count())['Enriched_Phenotypes'][1]
@@ -141,51 +151,45 @@ no_zebrafish = (gene_df_2.groupby(['Organism']).count())['Enriched_Phenotypes'][
 totalPhenotype = [no_celegans,no_dmelanogaster,no_mouse,no_zebrafish]
 org_totalPhenotype = dict(zip(organism,totalPhenotype))
 slider = ["humangene", "organism_ortholog", "organism_phenotype"]
-#---------------------------------------------------------------------------------
-col_swatch = px.colors.qualitative.Dark24
+
 # --------------------------------------------------------------------------------
 
-graph_stylesheet = [# colours based on organism
+graph_stylesheet = [
     # {
-    #     "selector": "." + organism[i],
-    #     "style": {"background-color": col_swatch[i], "line-color": col_swatch[i]
-    #               }
+    #     'selector': organism[i],       # colours based on organism
+    #     'style': {"background-color": col_swatch[i],
+    #               "line-color": col_swatch[i]
+    #               },
     # }
     # for i in range(len(organism))
+
 # colours based on organism
     {
         'selector': '[organism *= "dmelanogaster"]',
         'style': {
-            'background-color': 'yellow',
-            'line-colour': 'yellow',
+            'background-color': col_swatch[0],
+            'line-colour': col_swatch[0],
         }
     },
     {
         'selector': '[organism *= "mouse"]',
         'style': {
-            'background-color': 'green',
-            'line-colour': 'green',
+            'background-color': col_swatch[1],
+            'line-colour': col_swatch[1],
         }
     },
     {
         'selector': '[organism *= "celegans"]',
         'style': {
-            'background-color': 'pink',
-            'line-colour': 'pink',
+            'background-color': col_swatch[2],
+            'line-colour': col_swatch[2],
         }
     },
     {
         'selector': '[organism *= "zebrafish"]',
         'style': {
-            'background-color': 'orange',
-            'line-colour': 'orange',
-        }
-    },
-    {
-        'selector': '[organism *= "slimemould"]',
-        'style': {
-            'background-color': 'brown',
-            'line-colour': 'brown',
+            'background-color': col_swatch[3],
+            'line-colour': col_swatch[3],
         }
     }
 ]
@@ -218,12 +222,12 @@ graph_stylesheet += [
 
     {
         'selector': '.blue',
-        'style': {'background-color': '#18B6F3','line-color': '#18B6F3'
+        'style': {'background-color': '#18B6F3',
+                  'line-color': '#18B6F3'
                   }
     }
 
 ]
-
 
 # Define app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -254,7 +258,7 @@ navbar = dbc.NavbarSimple(
 
 topics_html = list()
 for topic_html in [
-    html.Span([str(i) + ": " + organism[i]], style={"color": col_swatch[i]})
+    html.Span([str(i+1) + ": " + organism[i]], style={"color": col_swatch[i]})
     for i in range(len(organism))
 ]:
     topics_html.append(topic_html)
@@ -301,7 +305,7 @@ body_layout = dbc.Container(
                     ],
                     sm=12,
                     md=4,
-                )  # remove ,
+                )
             ]
         ),
         dbc.Row(
@@ -327,7 +331,7 @@ body_layout = dbc.Container(
             
             -----
             """
-                )  # remove ,
+                )
             ]
         ),
         dbc.Row(
@@ -340,7 +344,7 @@ body_layout = dbc.Container(
                                     id='cytoscape-phenotype',
                                     layout={"name": "preset"},
                                     style={"width": "100%", "height": "800px"},
-                                    elements=edges + nodes,
+                                    elements= edges + nodes,   #change
                                     stylesheet=graph_stylesheet,
                                     #style={'width': '100%', 'height': '95vh'}
                                     minZoom = 0.6
@@ -350,9 +354,9 @@ body_layout = dbc.Container(
                         dbc.Row(
                             [
                                 dbc.Alert(
-                                    id="node-data",
-                                    children="Click on a node to see its details here",
-                                    color="secondary"
+                                    id='phenotype-data',
+                                    children='Click on a node to see its details here',
+                                    color='secondary'
                                 )
                             ]
                         )
@@ -372,7 +376,7 @@ body_layout = dbc.Container(
                             id="pathway_level",
                             options=[{"label": k, "value": k} for k in range(1,3)],
                             clearable=False,
-                            value=1,
+                            value=2,
                             style={"width": "50px"},
                         ),
                         dbc.Badge(
@@ -381,7 +385,7 @@ body_layout = dbc.Container(
                         dcc.Dropdown(
                             id="organism_dropdown",
                             options=[{"label": i + " (" + str(v)+ " phenotype(s))", "value": i} for i, v in org_totalPhenotype.items()],
-                            #value= options[1],
+                            #value= org_totalPhenotype.keys(),    #check??
                             multi=True,
                             style={"width": "100%"},
                         ),
@@ -408,66 +412,88 @@ body_layout = dbc.Container(
 app.layout = html.Div([navbar, body_layout])
 
 
+# @app.callback(
+#     Output('phenotype-data', 'children'),
+#     [Input('cytoscape-phenotype', 'tapNodeData')]
+# )
+# def display_phenotype(data):
+#     contents = 'Click on a node to see its details here'
+#     if data:
+#         contents = []
+#         #contents.append(html.H5('Phenotype: ' + str(data.get('metadata')[0])))
+#         contents.append(html.H5('Phenotype: ' + data.get('id')))
+#         contents.append(html.P('Hierchically related phenotype(s): ' + str(data.get('metadata')[1])))
+#         contents.append(html.P('Phenotype enrichment Q-value: ' + str(data.get('metadata')[3])))
+#         contents.append(html.P('Phenotype enrichment P-value: ' + str(data.get('metadata')[4])))
+#         return contents
+#     else:
+#         return contents
+
+# call back Node information -----------------
 @app.callback(
-    Output("node-data", "children"), [Input("cytoscape-phenotype", "selectedNodeData")]
+    Output('phenotype-data', 'children'),
+    [Input('cytoscape-phenotype', 'tapNodeData')]
 )
-def display_nodedata(selectedNodeData):
-    contents = "Click on a node to see its details here"
-    if selectedNodeData is not None:
-        if len(selectedNodeData) > 0:
-            data = selectedNodeData[-1]
-            contents = []
-            contents.append(html.H5("Phenotype: " + data["id"].title()))
-            contents.append(
-                html.P(
-                    "Lable: "
-                    + data["label"].title()
-                    + ", Size: "
-                    + data["size"]
-                )
-            )
-            #contents.append(
-            #    html.P(
-            #        "Color: "
-            #        + str(data["classes"])
-            #        + ", Position: "
-            #        + str(data["position"])
-            #    )
-            #)
-
-    return contents
-
-@app.callback(
-    Output("cytoscape-phenotype", "elements"),
-    [
-        Input("pathway_level", "value"),
-        Input("organism_dropdown", "value"),
-        Input("detail_slider", "value"),
-    ],
-)
-def filter_nodes(pathway_level, organism_list, detail_slider):
-    if (detail_slider == 3
-        and organism_list == organism
-        and pathway_lever == 1
-    ):
-        logger.info("Using the default element list")
-        return nodes+edges
-
+def display_nodeData(data):
+    contents = 'Click on a node to see its details here'
+    if data:
+        contents = []
+        if data.get('indent') == 'phenotype':
+            contents.append(html.H5('Phenotype: ' + data.get('label')))
+            contents.append(html.P('Hierchically related phenotype(s): ' + str(data.get('metadata')[1])))
+            contents.append(html.P('Phenotype enrichment Q-value: ' + str(data.get('metadata')[3])))
+            contents.append(html.P('Phenotype enrichment P-value: ' + str(data.get('metadata')[4])))
+            return contents
+        elif data.get('indent') == 'gene':
+            contents.append(html.H5('Gene ID: ' + data.get('label')))
+            return contents
+        elif data.get('indent') == 'ortholog':
+            contents.append(html.H5('Ortholog ID: ' + data.get('label')))
+            contents.append(html.P('Organism: ' + data.get('organism')))
+            return contents
     else:
-        # Generate node list
-        if org_list is not None and org_list != []:
-            new_df = df[df["Organism"].isin(org_list)]
+        return contents
+#-----------------------------------------------
 
-        new_gene_df, new_N_genes = load_dataframe(new_df)
-        new_nodes, new_edges = load_info_to_graph(new_gene_df, new_N_genes)
+# call back Slider + Dropdown -----------------
+# @app.callback(
+#     Output('cytoscape-phenotype', "elements"),
+#     [
+#         Input('pathway_level', 'value'),
+#         Input('organism_dropdown', 'value'),
+#         Input('detail_slider', 'value'),
+#     ]
+# )
+# def filter_nodes(pathway_level, organism_list, detail_slider):
+#     ctx = dash.callback_context
+#     if not ctx.triggered:
+#         return element
+#
+#     else:
+#         trigger_id = ctx.triggered[0]['prop_id'].split(".")[0]
+#         val = ctx.triggered[0]['value'].split(".")[0]
+#
+#         if trigger_id == 'pathway_level':
+#             pathway = val
+#             df = gene_df1 if val == 1 else gene_df2
+#         elif trigger_id == 'organism_dropdown':
 
-        #new_element = new_nodes + new_edges
+@app.callback(
+    Output('cytoscape-phenotype', "elements"),
+    [Input('pathway_level', 'value')]
+)
+def filter_nodes(pathway_level):
+    if pathway_level == 1:
+        metadata1 = db_retrieve.select_from_metadata("AHR")
+        new_nodes, new_edges = load_info_to_graph(gene_df_1, metadata1, N_genes_1)
+        new_element = new_edges + new_nodes
+        return new_element
 
-    return new_nodes + new_edges
+    return element
 
 
 
-# end_time = perf_counter()
-# print("\nElapsed time: " + str(end_time - sdk_start_time) + "s")  # get run time
+
+#----------------------------------------------
 if __name__ == '__main__':
     app.run_server(debug=False)  # set false so you can load bigger networks
