@@ -366,32 +366,44 @@ body_layout = dbc.Container(
                 ),
                 dbc.Col(
                     [
-                        dbc.Badge(
+                        dbc.Label('Search phenotype for a gene: ', html_for='gene_search'),
+                        dbc.Input(type='password', id='gene_search', placeholder="Enter a gene ID here"),
+                        dbc.FormText('The gene is not available in the pathway', color='secondary'),
+                        html.Div(style={'padding': 20}), #Space
+
+                        html.H4(dbc.Badge(
                             "Level of pathway(s):",
                             color="success",
                             className="ms-1",
 
-                        ),
+                        )),
                         dcc.Dropdown(
                             id="pathway_level",
-                            options=[{"label": k, "value": k} for k in range(1,3)],
+                            #options=[{"label": k, "value": k} for k in range(1,3)],
+                            options=[{"label": 'lower level', "value": 1},{"label": 'upper level', "value": 2}],
                             clearable=False,
-                            value=2,
-                            style={"width": "50px"},
+                            value= 2,
+                            style={"width": "150px"},
                         ),
-                        dbc.Badge(
+                        html.H4(dbc.Badge(
                             "Model organism(s):", color="success", className="mr-1"
-                        ),
+                        )),
                         dcc.Dropdown(
                             id="organism_dropdown",
                             options=[{"label": i + " (" + str(v)+ " phenotype(s))", "value": i} for i, v in org_totalPhenotype.items()],
-                            #value= org_totalPhenotype.keys(),    #check??
+                            value= [{"label": i + " (" + str(v)+ " phenotype(s))", "value": i} for i, v in org_totalPhenotype.items()] ,    #check??
                             multi=True,
                             style={"width": "100%"},
                         ),
-                        dbc.Badge(
+                        html.Div(style={'padding': 7}),
+                        dbc.Button("Search", id="search-button", className="me-2", n_clicks=0, size="sm",color="secondary"),
+                        html.Span(id="search-status", style={"verticalAlign": "middle"}),
+                        html.Div(style={'padding': 20}),  #Space
+
+                        html.H4(dbc.Badge(
                             "Choose level of visualisation:", color="success", className="mr-1"
-                        ),
+                        )),
+                        html.Div(style={'padding': 10}), #Space
                         dcc.Slider(
                             id='detail_slider',
                             min=1,
@@ -482,18 +494,43 @@ def display_nodeData(data):
     Output('cytoscape-phenotype', "elements"),
     [Input('pathway_level', 'value')]
 )
-def filter_nodes(pathway_level):
-    if pathway_level == 1:
+def filter_nodes(value):
+    if value == 1:
         metadata1 = db_retrieve.select_from_metadata("AHR")
         new_nodes, new_edges = load_info_to_graph(gene_df_1, metadata1, N_genes_1)
         new_element = new_edges + new_nodes
         return new_element
 
     return element
-
-
-
-
+#----------------------------------------------
+# @app.callback(
+#     Output('cytoscape-phenotype', 'elements'),
+#     [Input('pathway_level', 'value'),
+#      Input('organism_dropdown', 'value')]
+# )
+# def filter_nodes(pathway_level):
+#     if pathway_level == 1:
+#         metadata1 = db_retrieve.select_from_metadata("AHR")
+#         new_nodes, new_edges = load_info_to_graph(gene_df_1, metadata1, N_genes_1)
+#         new_element = new_edges + new_nodes
+#         return new_element
+#
+#     return element
+#---------------------------------------------
+# @app.callback(
+#     Output('cytoscape-phenotype', 'elements'),
+#     [Input('detail_slider', 'value')]
+# )
+# def level_visualisation(slider_value):
+#     if slider_value == int(1):
+#
+#         metadata1 = db_retrieve.select_from_metadata("AHR")
+#         new_nodes, new_edges = load_info_to_graph(gene_df_1, metadata1, N_genes_1)
+#         new_nodes, new_edges = load_info_to_graph(gene_df_1, metadata1, N_genes_1)
+#         new_element = new_edges + new_nodes
+#         return new_element
+#
+#     return element
 #----------------------------------------------
 if __name__ == '__main__':
     app.run_server(debug=False)  # set false so you can load bigger networks
