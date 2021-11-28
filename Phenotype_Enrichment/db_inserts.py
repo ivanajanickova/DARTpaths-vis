@@ -53,6 +53,10 @@ class DatabaseInserts:
         self.conn.commit()
 
     def insert_into_pathway_hierarchy(self, top_level_pathway: str, low_level_patway: str) -> None:
+        """Insert into pathway hierarchy table.
+
+        :param top_level_pathway: the higher level pathway
+        :param low_level_patway: the lower level pathway"""
         self.conn.rollback()
         try:
             postgreSQL_select_Query = "SELECT * FROM PATHWAY_HIERARCHY WHERE TOP_LEVEL_PATHWAY = %s"
@@ -75,8 +79,10 @@ class DatabaseInserts:
             print(e)
             print("Failed")
 
-
     def insert_into_pathway_genes(self, pathway_name: str, genes_names: list) -> None:
+        """Insert into pathway genes table.
+        :param pathway_name: the name of the pathway
+        :param genes_names: a list of unique human gene names that make up the pathway"""
         try:
             postgres_insert_query = """INSERT INTO PATHWAY_GENES (PATHWAY_NAME, GENES) VALUES (%s,%s)"""
             record_to_insert = (pathway_name, genes_names)
@@ -85,5 +91,6 @@ class DatabaseInserts:
         except:
             print("already exists")
 
-    def close_connection(self):
+    def close_conn(self):
+        """Close connection after all inserts are finished."""
         self.conn.close()

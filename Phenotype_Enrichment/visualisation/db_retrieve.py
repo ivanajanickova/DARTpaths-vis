@@ -30,6 +30,7 @@ def select_from_enrichment_results(pathway_name: str) -> pd.DataFrame:
     :param pathway_name: the name of the pathway to be passed in query
     :return: df corresponding to the records for `pathway_name`
     """
+    metadata = select_from_metadata(pathway_name)
     genes = select_from_pathway_genes(pathway_name=pathway_name)
     human_genes = []
     ortholog_genes = []
@@ -49,10 +50,16 @@ def select_from_enrichment_results(pathway_name: str) -> pd.DataFrame:
             enrichment_results = cursor.fetchall()
 
             for row in enrichment_results:
+                new_phen_list = []
                 human_genes.append(gene)
                 ortholog_genes.append(row[2])
                 organism.append(row[3])
-                enriched_phenotypes.append(row[4])
+                phenotype_list = row[4]
+                for phen in phenotype_list:
+                    if metadata.get(phen) is not None and metadata.get(phen)[3] <= 10:
+                        new_phen_list.append(phen)
+
+                enriched_phenotypes.append(new_phen_list)
 
         cursor.close()
         conn.close()

@@ -145,12 +145,12 @@ class DataExtraction:
         unique_genes = set([self.genes_orthologs_df.iloc[i, 1] for i in range(0, len(self.genes_orthologs_df))])
         DbInserts.insert_into_pathway_genes(pathway_name=self.pathway_name,
                                             genes_names=[str(gene) for gene in unique_genes])
-        #if (self.top_level_pathway_name != "None"):
-        #    DbInserts.insert_into_pathway_hierarchy(top_level_pathway=self.top_level_pathway_name,
-                                                    #low_level_patway=self.pathway_name)
-       # DbInserts.insert_into_enrichment_results(df=df)
-        #DbInserts.insert_into_phenotype_metadata(pathway_name=self.pathway_name, metadata=metadata_json)
-        DbInserts.close_connection()
+        if (self.top_level_pathway_name != "None"):
+            DbInserts.insert_into_pathway_hierarchy(top_level_pathway=self.top_level_pathway_name,
+                                                    low_level_patway=self.pathway_name)
+        DbInserts.insert_into_enrichment_results(df=df)
+        DbInserts.insert_into_phenotype_metadata(pathway_name=self.pathway_name, metadata=metadata_json)
+        DbInserts.close_conn()
 
 
 ########################################################################################################################

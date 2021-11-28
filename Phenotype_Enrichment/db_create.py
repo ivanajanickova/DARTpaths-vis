@@ -47,43 +47,6 @@ def create_tables():
         print("Failed to insert record into mobile table", error)
 
 
-def delete_row(condition: str) -> None:
-    command = """DELETE FROM PATHWAY_GENES"""
-    try:
-        conn = psycopg2.connect(user="wahiiuuseanslh",
-                                password="3370a0e2c90b0d8eb13192a4de38b57556f0e98bc083e50d9157dd82b4d12619",
-                                host="ec2-54-171-25-232.eu-west-1.compute.amazonaws.com",
-                                port="5432",
-                                database="d8re051vcjq8v1")
-        cursor = conn.cursor()
-        cursor.execute(command)
-        cursor.close()
-        conn.commit()
-        conn.close()
-    except (Exception, psycopg2.Error) as error:
-        print("Failed to insert record into mobile table", error)
-
-def insert_into_pathway_hierarchy() -> None:
-    try:
-        conn = psycopg2.connect(user="wahiiuuseanslh",
-                                password="3370a0e2c90b0d8eb13192a4de38b57556f0e98bc083e50d9157dd82b4d12619",
-                                host="ec2-54-171-25-232.eu-west-1.compute.amazonaws.com",
-                                port="5432",
-                                database="d8re051vcjq8v1")
-        cursor = conn.cursor()
-        postgreSQL_select_Query = "INSERT INTO PATHWAY_HIERARCHY (TOP_LEVEL_PATHWAY, LOW_LEVEL_PATHWAY) VALUES (%s,%s)"""
-        record_to_insert = ("Phase1CompoundFunctionalization", ["AHR", "EthanolOxidation", "AmineOxidase"])
-        cursor.execute(postgreSQL_select_Query, record_to_insert)
-        conn.commit()
-        cursor.close()
-        conn.close()
-    except (Exception, psycopg2.Error) as error:
-        print("Failed to insert record into mobile table", error)
-
-
-
-
 
 if __name__ == '__main__':
-    delete_row("Phase1CompoundFunctionalization")
- #   insert_into_pathway_hierarchy()
+   create_tables()
