@@ -1,12 +1,13 @@
 import json
-import pickle
 from pathlib import Path
 from typing import List
-import db_inserts
+from db_inserts import DatabaseInserts
 
 import pandas as pd
 import pickle
 import os
+
+DbInserts = DatabaseInserts()
 
 
 def extract_phenotypes_info(ontology_files_list: List[str]) -> None:
@@ -61,6 +62,7 @@ class DataExtraction:
         self.metadata = {}
         self.pathway_name = ""
         self.top_level_pathway_name = ""
+        self.orthologs_names_mapping = {}
 
     def add_enrichment_phenotypes_set(self, enrichment_df: pd.DataFrame) -> None:
         """Add enriched phenotypes to the set object `self.enriched_phenotypes_set`.
@@ -75,7 +77,9 @@ class DataExtraction:
         for gene_id in self.orthologs_phenotype_dict.keys():
             enriched_phenotypes_list = []
             for phen_id in self.orthologs_phenotype_dict.get(gene_id):
-                if phen_id in self.enriched_phenotypes_set:
+                if phen_id in self.enriched_phenotypes_set and \
+                        self.metadata.get(phen_id) is not None and \
+                        self.metadata.get(phen_id)[3] <= 10:
                     enriched_phenotypes_list.append(phen_id)
 
             self.orthologs_phenotype_dict[gene_id] = enriched_phenotypes_list
@@ -127,28 +131,26 @@ class DataExtraction:
 
             [self.metadata[phenotype_id].append(round(float(enrichment_df.iloc[i, j]), 3)) for j in cols_indexes]
 
-    def save_data_to_files(self) -> None:
-        """Save extracted data from two DataFrames as csv files.
-        The file will be saved in the pathway enrichment folder e.g.: `AHR_R-HSA-8937144_Enrichment_Results`.
-        """
-        self.genes_orthologs_df.to_csv("genes_orthologs_data.csv", index=False)
-
-        with open("orthologs_to_phenotype_data.pkl", "wb") as file:
-            pickle.dump(self.orthologs_phenotype_dict, file)
-
         with open("metadata.json", "w") as file:
             json.dump(self.metadata, file)
 
     def save_data_to_db(self) -> None:
+        print("save to DB")
         """Save the data from a given pathway into the postgresql database."""
         df = get_combined_df(self.genes_orthologs_df,
-                             self.orthologs_phenotype_dict,
-                             self.pathway_name,
-                             self.top_level_pathway_name)
+                             self.orthologs_names_mapping,
+                             self.orthologs_phenotype_dict)
         metadata_json = json.dumps(self.metadata)
-        print(df)
-        db_inserts.insert_into_enrichment_results(df=df)
-        db_inserts.insert_into_phenotype_metadata(pathway_name=self.pathway_name, metadata=metadata_json)
+        print(f"Dataframe: {df}")
+        unique_genes = set([self.genes_orthologs_df.iloc[i, 1] for i in range(0, len(self.genes_orthologs_df))])
+        DbInserts.insert_into_pathway_genes(pathway_name=self.pathway_name,
+                                            genes_names=[str(gene) for gene in unique_genes])
+        #if (self.top_level_pathway_name != "None"):
+        #    DbInserts.insert_into_pathway_hierarchy(top_level_pathway=self.top_level_pathway_name,
+                                                    #low_level_patway=self.pathway_name)
+       # DbInserts.insert_into_enrichment_results(df=df)
+        #DbInserts.insert_into_phenotype_metadata(pathway_name=self.pathway_name, metadata=metadata_json)
+        DbInserts.close_connection()
 
 
 ########################################################################################################################
@@ -157,37 +159,18 @@ class DataExtraction:
 
 
 def get_combined_df(genes_orthologs_df,
-                    orthologs_phenotype_dict,
-                    low_level_pathway: str,
-                    top_level_pathway: str) -> pd.DataFrame:
+                    orthologs_names_mapping,
+                    orthologs_phenotype_dict) -> pd.DataFrame:
     """Return the dataframe corresponding to the summarised information"""
-
     associated_phenotypes = []
     for i in range(0, len(genes_orthologs_df)):
-        associated_phenotypes.append(
-            orthologs_phenotype_dict.get(genes_orthologs_df.iloc[i, 0]))
+        associated_phenotypes.append(orthologs_phenotype_dict.get(genes_orthologs_df.iloc[i, 0]))
+        genes_orthologs_df.iloc[i, 0] = orthologs_names_mapping.get(
+            genes_orthologs_df.iloc[i, 0])  # change geneID to name
 
     genes_orthologs_df["associated_phenotype"] = associated_phenotypes
-    genes_orthologs_df["low_level_pathway"] = [low_level_pathway for i in range(0, len(genes_orthologs_df))]
-    genes_orthologs_df["top_level_pathway"] = [top_level_pathway for i in range(0, len(genes_orthologs_df))]
-    return genes_orthologs_df
 
-
-def get_combined_df2(path_to_pathway_enrichment: str, low_level_pathway: str, top_level_pathway: str) -> pd.DataFrame:
-    """Return the dataframe corresponding to the summarised information"""
-    genes_orthologs_df = pd.read_csv(path_to_pathway_enrichment + "/genes_orthologs_data.csv")
-    with open(path_to_pathway_enrichment + "/orthologs_to_phenotype_data.pkl", "rb") as file:
-        orthologs_phenotype_dict = pickle.load(file)
-
-    associated_phenotypes = []
-    for i in range(0, len(genes_orthologs_df)):
-        associated_phenotypes.append(
-            orthologs_phenotype_dict.get(genes_orthologs_df.iloc[i, 0]))
-
-    genes_orthologs_df["associated_phenotype"] = associated_phenotypes
-    genes_orthologs_df["low_level_pathway"] = [low_level_pathway for i in range(0, len(genes_orthologs_df))]
-    genes_orthologs_df["top_level_pathway"] = [top_level_pathway for i in range(0, len(genes_orthologs_df))]
-    return genes_orthologs_df
+    return genes_orthologs_df.dropna()
 
 
 def get_related_phenotypes(phenotype_id: str) -> List[str]:

@@ -2,70 +2,88 @@ import json
 import pandas as pd
 import psycopg2
 
+
 ####################################################################################
 # Define functions for inserting data into database ################################
 ####################################################################################
 
+class DatabaseInserts:
 
-def insert_into_enrichment_results(df: pd.DataFrame) -> None:
-    """Insert a dataframe of enrichment results for a given pathway.
+    def __init__(self):
+        self.conn = psycopg2.connect(user="wahiiuuseanslh",
+                                     password="3370a0e2c90b0d8eb13192a4de38b57556f0e98bc083e50d9157dd82b4d12619",
+                                     host="ec2-54-171-25-232.eu-west-1.compute.amazonaws.com",
+                                     port="5432",
+                                     database="d8re051vcjq8v1")
+        self.cursor = self.conn.cursor()
 
-    :param df: dataframe of the enrichment results with cols corresponding to the cols in the DB table
-    """
-    global cursor, conn
-    try:
-        conn = psycopg2.connect(user="scfhbchnxiyzrp",
-                                password="146d74fa3f155b51373badc4fdf76a315d36f0db7b4a0cc61bb69bfae4fcba0c",
-                                host="ec2-54-74-95-84.eu-west-1.compute.amazonaws.com",
-                                port="5432",
-                                database="dcfbco2ll2unns")
-        cursor = conn.cursor()
-        for row in range(0, len(df)):
-            postgres_insert_query = """INSERT INTO ENRICHMENT_RESULTS (LOW_LEVEL_PATHWAY, TOP_LEVEL_PATHWAY, 
-            HUMAN_GENE, ORTHOLOG_GENE, ORGANISM, ENRICHED_PHENOTYPES) VALUES (%s,%s,%s,%s,%s,%s)"""
-            record_to_insert = (df.iloc[row, 4], df.iloc[row, 5],
-                                df.iloc[row, 1], df.iloc[row, 0],
-                                df.iloc[row, 2], df.iloc[row, 3])
-            cursor.execute(postgres_insert_query, record_to_insert)
-
-            conn.commit()
-            count = cursor.rowcount
-            print(count, "Record inserted successfully into mobile table")
-
+    def close_connection(self):
         # Close the DB connection
-        cursor.close()
-        conn.close()
+        self.cursor.close()
+        self.conn.close()
         print("PostgreSQL connection is closed")
 
-    except (Exception, psycopg2.Error) as error:
-        print("Failed to insert record into mobile table", error)
+    def insert_into_enrichment_results(self, df: pd.DataFrame) -> None:
+        """Insert a dataframe of enrichment results for a given pathway.
 
+        :param df: dataframe of the enrichment results with cols corresponding to the cols in the DB table
+        """
+        for row in range(0, len(df)):
+            try:
+                postgres_insert_query = """INSERT INTO ENRICHMENT_RESULTS (HUMAN_GENE, ORTHOLOG_GENE, 
+                ORGANISM, ENRICHED_PHENOTYPES) VALUES (%s,%s,%s,%s)"""
+                record_to_insert = (df.iloc[row, 1], df.iloc[row, 0],
+                                    df.iloc[row, 2], df.iloc[row, 3])
+                self.cursor.execute(postgres_insert_query, record_to_insert)
+                self.conn.commit()
+            except:
+                print("Record already exists.")
+                self.conn.rollback()
 
-def insert_into_phenotype_metadata(pathway_name: str, metadata: json) -> None:
-    """Insert a record corresponding to the json obj of metadata for app phenotypes of a given pathway.
+    def insert_into_phenotype_metadata(self, pathway_name: str, metadata: json) -> None:
+        """Insert a record corresponding to the json obj of metadata for app phenotypes of a given pathway.
 
-    :param pathway_name: the name of the pathway to which will be the phenotypes associated
-    :param metadata: a json obj of metadata for all phenotypes of the pathway
-    """
-    global conn, cursor
-    try:
-        conn = psycopg2.connect(user="scfhbchnxiyzrp",
-                                password="146d74fa3f155b51373badc4fdf76a315d36f0db7b4a0cc61bb69bfae4fcba0c",
-                                host="ec2-54-74-95-84.eu-west-1.compute.amazonaws.com",
-                                port="5432",
-                                database="dcfbco2ll2unns")
-        cursor = conn.cursor()
-
+        :param pathway_name: the name of the pathway to which will be the phenotypes associated
+        :param metadata: a json obj of metadata for all phenotypes of the pathway
+        """
         postgres_insert_query = """INSERT INTO PHENOTYPE_METADATA (PATHWAY, METADATA) VALUES (%s,%s)"""
         record_to_insert = (pathway_name, metadata)
-        cursor.execute(postgres_insert_query, record_to_insert)
+        self.cursor.execute(postgres_insert_query, record_to_insert)
 
-        conn.commit()
+        self.conn.commit()
 
-        # Close the DB connection
-        cursor.close()
-        conn.close()
-        print("PostgreSQL connection is closed")
+    def insert_into_pathway_hierarchy(self, top_level_pathway: str, low_level_patway: str) -> None:
+        self.conn.rollback()
+        try:
+            postgreSQL_select_Query = "SELECT * FROM PATHWAY_HIERARCHY WHERE TOP_LEVEL_PATHWAY = %s"
+            self.cursor.execute(postgreSQL_select_Query, (top_level_pathway,))
+            low_level_pathways_list = self.cursor.fetchall()
+            if len(low_level_pathways_list) != 0:
+                postgres_update_query = """ UPDATE PATHWAY_HIERARCHY 
+                                                            SET LOW_LEVEL_PATHWAY = %s  
+                                                            WHERE TOP_LEVEL_PATHWAY = %s"""
+                record_to_insert = (low_level_pathways_list.append(low_level_patway), top_level_pathway)
+                self.cursor.execute(postgres_update_query, record_to_insert)
+                self.conn.commit()
+            else:
+                postgres_insert_query = """INSERT INTO PATHWAY_HIERARCHY (TOP_LEVEL_PATHWAY, LOW_LEVEL_PATHWAY) VALUES (%s,
+                %s) """
+                record_to_insert = (top_level_pathway, [low_level_patway])
+                self.cursor.execute(postgres_insert_query, record_to_insert)
+                self.conn.commit()
+        except Exception as e:
+            print(e)
+            print("Failed")
 
-    except (Exception, psycopg2.Error) as error:
-        print("Failed to insert record into mobile table", error)
+
+    def insert_into_pathway_genes(self, pathway_name: str, genes_names: list) -> None:
+        try:
+            postgres_insert_query = """INSERT INTO PATHWAY_GENES (PATHWAY_NAME, GENES) VALUES (%s,%s)"""
+            record_to_insert = (pathway_name, genes_names)
+            self.cursor.execute(postgres_insert_query, record_to_insert)
+            self.conn.commit()
+        except:
+            print("already exists")
+
+    def close_connection(self):
+        self.conn.close()
