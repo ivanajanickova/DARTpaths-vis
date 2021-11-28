@@ -31,6 +31,7 @@ from pathlib import Path
 
 # for the loading information for text preprocessing
 import preprocessing
+
 preprocessing_obj = preprocessing.DataExtraction()
 
 # this is necessary for zebrafish
@@ -95,7 +96,6 @@ if my_file.exists():
         wget.download('https://reactome.org/download/current/Ensembl2Reactome_All_Levels.txt', out=Reactome_file)
 else:
     wget.download('https://reactome.org/download/current/Ensembl2Reactome_All_Levels.txt', out=Reactome_file)
-
 
 # Creating a PoolManager instance for sending requests.
 http = urllib3.PoolManager()
@@ -368,7 +368,7 @@ for organism in organism_list:
                 out=Slime_mould_phenotype_database)
 
     # Ontology databases
-    #Already included at the Phenotype database
+    # Already included at the Phenotype database
 
     elif organism == "dmelanogaster":
         # ENSEMBL DATABASES (orthologs), same as the one used for ortholog mapping part
@@ -465,11 +465,11 @@ path_to_names = Path("ontology_data/phenotype_names.pkl")
 if path_to_phenotypes.is_file() is False or path_to_names.is_file() is False:
     preprocessing.extract_phenotypes_info(ontology_files_list)
 
-
 # Write Output to File #
-#change this to include pathway identifier and species name to keep results organized.
+# change this to include pathway identifier and species name to keep results organized.
 
 phenotype_enrichment_result_file = pathID + "_phenotype_enrichment_result.txt"
+
 
 ##### --------------------------------------------------------------------------- ###############################
 
@@ -569,6 +569,7 @@ def selectPathway(reactomefile):
                 sys.stderr.write("Pathway not found")  # the exception
     reactomefile.close()
     pathgenes_raw = list(zip(*pathway))[0]  # select only pathway genes
+
     pathgenes = list(pathgenes_raw)
     #
     #  print("-----print_pathgenes raw ------ start-----")
@@ -593,22 +594,31 @@ def selectForMapping(organism):
     if organism == "celegans":
         df_celegans = pd.read_csv(C_ele_ENSEMBL_orthology_database, delimiter='\t', header='infer')
         selectgenes = df_celegans[['Caenorhabditis elegans gene stable ID', 'Gene stable ID']].copy()
+        gene_name = df_celegans[['Caenorhabditis elegans gene stable ID', 'Caenorhabditis elegans gene name']]
+        for i in range(0, len(gene_name)):
+            preprocessing_obj.orthologs_names_mapping[gene_name.iloc[i, 0]] = gene_name.iloc[i, 1]
+
 
     elif organism == "zebrafish":
         df_zebrafish = pd.read_csv(Zebrafish_ENSEMBL_orthology_database, delimiter='\t', header='infer')
         selectgenes = df_zebrafish[['Zebrafish gene name', 'Gene stable ID']].copy()
+        gene_name = df_zebrafish[['Zebrafish gene name', 'Zebrafish gene name']]
+        for i in range(0, len(gene_name)):
+            preprocessing_obj.orthologs_names_mapping[gene_name.iloc[i, 0]] = gene_name.iloc[i, 1]
 
     elif organism == "mouse":
         df_mouse = pd.read_csv(Mouse_ENSEMBL_orthology_database, delimiter='\t', header='infer')
         selectgenes = df_mouse[['Mouse gene name', 'Gene stable ID']].copy()
-
-    elif organism == "slimemould":
-        df_slime = pd.read_csv(Slime_mould_ENSEMBL_orthology_database, delimiter='\t', header='infer')
-        selectgenes = df_slime[['homology_gene_stable_id', 'gene_stable_id']].copy()
+        gene_name = df_mouse[['Mouse gene name', 'Mouse gene name']]
+        for i in range(0, len(gene_name)):
+            preprocessing_obj.orthologs_names_mapping[gene_name.iloc[i, 0]] = gene_name.iloc[i, 1]
 
     elif organism == "dmelanogaster":
         df_dmelanogaster = pd.read_csv(Fly_ENSEMBL_orthology_database, delimiter='\t', header='infer')
         selectgenes = df_dmelanogaster[['Drosophila melanogaster gene stable ID', 'Gene stable ID']].dropna().copy()
+        gene_name = df_dmelanogaster[['Drosophila melanogaster gene stable ID', 'Drosophila melanogaster gene name']]
+        for i in range(0, len(gene_name)):
+            preprocessing_obj.orthologs_names_mapping[gene_name.iloc[i, 0]] = gene_name.iloc[i, 1]
 
     selectgenes.to_csv('pd_orthofile.txt.tmp')
     orthofile = open("pd_orthofile.txt.tmp", "r")
@@ -652,10 +662,10 @@ def removeEmptylines(ortholog):
 def Readgenes(df_ortholog, df_new_orthos, organism):
     # load information for preprocessing module
     preprocessing_obj.add_genes_vs_orthologs_data(df_ortholog=df_ortholog, organism=organism)
-
     orthologs_combined = pd.DataFrame()
     genes_of_interest = df_ortholog.iloc[:, 0].copy()
     genes_of_interest = genes_of_interest.to_frame()
+    genes_of_interest = genes_of_interest.dropna()
     genes_of_interest.rename(columns={genes_of_interest.columns[0]: 'Genes'}, inplace=True)
 
     if df_new_orthos.empty:
@@ -680,9 +690,11 @@ def Phenotypes(organism):
         phcelegans = pd.read_csv(C_ele_phenotype_database, skiprows=3, delimiter='\t', header=None)
         phcelegans2 = phcelegans[phcelegans.iloc[:, 3] != 'NOT'].copy()
         phenotype = phcelegans2.iloc[:, [1, 4]].copy()
+        phenotype.columns = ['Genes', 'Phenotypes']
 
 
     elif organism == "zebrafish":
+
         col_names = ['ID', 'Gene Symbol', 'GeneID', 'Affected Structure or Process 1 subterm ID',
                      'Affected Structure or Process 1 subterm Name', 'Post-composed Relationship ID',
                      'Post-composed Relationship Name',
@@ -698,9 +710,9 @@ def Phenotypes(organism):
         cols = ['Affected Structure or Process 1 subterm ID', 'Affected Structure or Process 1 superterm ID']
         phzfish['affected_id'] = phzfish[cols].apply(lambda row: ','.join(row.values.astype(str)), axis=1)
         phzfish2 = pd.DataFrame(phzfish.affected_id.str.split(',').values.tolist(),
-                                index=phzfish['Gene Symbol']).stack()
-        phzfish2 = phzfish2.reset_index([0, 'Gene Symbol'])
-        phzfish2.columns = ['Gene Symbol', 'Affected Phenotype ID']
+                                index=phzfish['ID']).stack()
+        phzfish2 = phzfish2.reset_index([0, 'ID'])
+        phzfish2.columns = ['ID', 'Affected Phenotype ID']
         phzfish3 = phzfish2[(phzfish2 != 'nan').all(1)]
         phenotype = phzfish3.drop_duplicates()
 
@@ -714,18 +726,6 @@ def Phenotypes(organism):
         phenotype.columns = ['marker_symbol', 'split_phen']
 
 
-
-
-    elif organism == "slimemould":
-        phslime = pd.read_csv(Slime_mould_phenotype_database, delimiter='\t', header='infer')
-        phenotype = pd.DataFrame(phslime['DDB_G_ID'].str.split('|').values.tolist(), index=phslime.Phenotypes).stack()
-        phenotype = phenotype.reset_index([0, 'Phenotypes'])
-        phenotype.columns = ['DDB_G_ID', 'Phenotypes']
-        phenotype.columns = ['Phenotypes', 'DDB_G_ID']
-        phenotype = pd.DataFrame(phenotype['Phenotypes'].str.split('|', expand=True).values.tolist(),
-                                 index=phenotype['DDB_G_ID']).stack()
-        phenotype = phenotype.reset_index([0, 'DDB_G_ID'])
-        phenotype.columns = ['DDB_G_ID', 'Phenotypes']
 
 
     elif organism == "dmelanogaster":
@@ -788,7 +788,6 @@ def Enrichment(organism, genes, phenotypes):
     # to see the annotated genes
     annotatedg = pd.merge(genes, phenotypes, on=['Genes'], how='inner').copy()
     uniquegenes = annotatedg.drop_duplicates(subset=['Genes'], keep='first', inplace=False)
-
     # load to the preprocessing_obj
     preprocessing_obj.add_ortholog_vs_phenotype_data(genes_phen_df=annotatedg)
 
@@ -800,7 +799,6 @@ def Enrichment(organism, genes, phenotypes):
     overlapgenes = uniquerow_agg.reset_index()
     overlapgenes.rename(columns={overlapgenes.columns[0]: 'Enriched Phenotype'}, inplace=True)
     # Overlapgenes ends here
-
     # count the phenotypes starts here
     countphen = uniquerows.iloc[:, 1].copy()
     count_phenotypes = countphen.value_counts()
@@ -822,7 +820,6 @@ def Enrichment(organism, genes, phenotypes):
     N = count_annotated_genes
     # start modify dataframe needed for m
     uniquegenesdb = phenotypes.drop_duplicates(subset=['Genes'], keep='first', inplace=False)
-
 
     # end needed for m
     # to make the outputs
@@ -849,7 +846,6 @@ def Enrichment(organism, genes, phenotypes):
     df_enrichment['rank'] = range(1, 1 + len(df_enrichment))
     M = len(counts)
     Q = 0.1
-
     qval = []
 
     for tupleBH in df_enrichment.itertuples():
@@ -862,14 +858,6 @@ def Enrichment(organism, genes, phenotypes):
     if sigenrichment.empty:
         print(organism, ':\tNo enriched phenotypes!')
 
-    if organism == 'slimemould':
-        if sigenrichment.empty:
-            pass
-        else:
-            sigenrichment = pd.merge(sigenrichment, overlapgenes, on=['Enriched Phenotype'], how='inner').copy()
-            sigenrichment['Overlap Genes'] = [','.join(map(str, l)) for l in sigenrichment['Genes']]
-            sigenrichment = sigenrichment.drop(columns=['Genes'])
-
     elif organism == 'dmelanogaster':
         if sigenrichment.empty:
             pass
@@ -879,6 +867,7 @@ def Enrichment(organism, genes, phenotypes):
             sigenrichment = sigenrichment.drop(columns=['Genes'])
 
     preprocessing_obj.add_metadata(sigenrichment)
+    preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=sigenrichment)
     return sigenrichment, overlapgenes
 
 
@@ -1012,13 +1001,10 @@ def addInfo(enrichedOnthologyFinal, genes, pathgenes, organism, sigenrichment):
     info.write('organism: ' + organism + '\n')
     if organism == "slimemould":
         sigenrichment.to_csv(info, index=False, sep='\t')
-        preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=sigenrichment)
     elif organism == "dmelanogaster":
         sigenrichment.to_csv(info, index=False, sep='\t')
-        preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=sigenrichment)
     else:
         enrichedOnthologyFinal.to_csv(info, index=False, sep='\t')
-        preprocessing_obj.add_enrichment_phenotypes_set(enrichment_df=enrichedOnthologyFinal)
     info.close()
 
 
@@ -1085,4 +1071,3 @@ runSummary()
 
 preprocessing_obj.filter_phenotypes()
 preprocessing_obj.save_data_to_db()
-

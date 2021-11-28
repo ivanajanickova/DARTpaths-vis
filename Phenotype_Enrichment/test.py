@@ -1,4 +1,4 @@
-import db_retrieve
+from visualisation import db_retrieve
 
 #######################################################################################################################
 # Interface for retrieving the data from DB ###########################################################################
@@ -13,33 +13,36 @@ import db_retrieve
 # The list of pathways we have so far:
 # AmineOxidase
 # Phase2ConjugationOfCompounds
-# Phase1CompundFunctionalization
+# Phase1CompoundFunctionalization
 # AminoAcidConjugation
 # EthanolOxidation
 # AHR
 
-df = db_retrieve.select_from_enrichment_results("AmineOxidase")
-print(df)
+df = db_retrieve.select_from_enrichment_results("AHR")
+
+
 
 # Retrieve phenotype metadata
-metadata = db_retrieve.select_from_metadata("AmineOxidase")
-print(metadata)
+metadata = db_retrieve.select_from_metadata("AHR")
+
 
 # Retrieve the name of the higher level pathway
-name = db_retrieve.find_top_level_pathway("AmineOxidase")
+name = db_retrieve.find_top_level_pathway("AHR")
 name = name[0][0]
-print(name)  # print pure string
+print(name)
+# print(name)  # print pure string
 
 # You can then analogously retrieve info for the higher level data
-df_2 = db_retrieve.select_from_enrichment_results(name)
-print(df_2)
+#df_2 = db_retrieve.select_from_enrichment_results(name)
+# print(df_2)
 
 ############################
 # Get Phenotype Metadata ###
 ############################
 # retrieve data for a phenotype - If the phenotype data are 'nice' - such as for c. elegans
 # 'Nice' means that the database in the preprocessing contained name of phenotype & list of related phenotypes
-random_phenotype_list = df.iloc[1300, 3]
+
+random_phenotype_list = df.iloc[40, 3]
 for random_phenotype in random_phenotype_list:
     print(random_phenotype)
     print(metadata.get(random_phenotype))
@@ -49,3 +52,4 @@ random_phenotype_list = df.iloc[3, 3]
 for random_phenotype in random_phenotype_list:
     print(random_phenotype)
     print(metadata.get(random_phenotype))
+

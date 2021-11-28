@@ -1,4 +1,4 @@
-# Basic info
+_# Basic info
 
 ## Setting up the repository and environment locally
 ### Clone repo
