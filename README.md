@@ -1,5 +1,3 @@
-_# Basic info
-
 ## Setting up the repository and environment locally
 ### Clone the repository
 * `git clone https://github.com/ivanajanickova/DARTpaths-vis.git`
@@ -17,7 +15,7 @@ _# Basic info
 * where: 
   * R-HSA-69239 is reactome pathway
   * "AHR" is the name of the pathway
-  * "Phase1CompoundFunctionalization" is upper pathway name
+  * "Phase1CompoundFunctionalization" is upper level pathway name
   * `$HOME/DARTpaths-vis/` is path to the root 
   * you need to change root pathway in the bash script in case you run this on Windows machine
 
@@ -26,3 +24,8 @@ _# Basic info
 * go to `Phenotype_Enrichment/visualisation/`
 * run `app.py`
 * click on the link that appears
+
+
+## Troubleshooting
+* Windows users can experience issues with the `run_enrichment_for_pathways.sh` since the `Python_APRIL_2021_phenotype_enrichment.py` is not optimised for Windows machines
+* We recommend running this step on Linux machine
