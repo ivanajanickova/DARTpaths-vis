@@ -621,7 +621,7 @@ def selectForMapping(organism):
             preprocessing_obj.orthologs_names_mapping[gene_name.iloc[i, 0]] = gene_name.iloc[i, 1]
 
     selectgenes.to_csv('pd_orthofile.txt.tmp')
-    orthofile = open("pd_orthofile.txt.tmp", "r")
+    orthofile = open("../pd_orthofile.txt.tmp", "r")
 
     return orthofile
 

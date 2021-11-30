@@ -40,10 +40,10 @@ def extract_phenotypes_info(ontology_files_list: List[str]) -> None:
                     names_dict[line.split(" ")[1]] = line.split("!")[1].strip()  # add id and name of related phenotype
 
     # pickle the dictionaries
-    with open("ontology_data/related_phenotypes.pkl", "wb") as file:
+    with open("../ontology_data/related_phenotypes.pkl", "wb") as file:
         pickle.dump(phenotypes_dict, file)
 
-    with open("ontology_data/phenotype_names.pkl", "wb") as file:
+    with open("../ontology_data/phenotype_names.pkl", "wb") as file:
         pickle.dump(names_dict, file)
 
 
@@ -175,7 +175,7 @@ def get_combined_df(genes_orthologs_df,
 
 def get_related_phenotypes(phenotype_id: str) -> List[str]:
     """Return a list of related phenotypes. These phenotypes are in an "is_a" relationship to the queried phenotype."""
-    with open("ontology_data/related_phenotypes.pkl", "rb") as file:
+    with open("../ontology_data/related_phenotypes.pkl", "rb") as file:
         related_phenotypes = pickle.load(file)
 
     return related_phenotypes.get(phenotype_id)
@@ -183,7 +183,7 @@ def get_related_phenotypes(phenotype_id: str) -> List[str]:
 
 def get_phenotype_name(phenotype_id: str) -> str:
     """Return the literal name of the phenotype."""
-    with open("ontology_data/phenotype_names.pkl", "rb") as file:
+    with open("../ontology_data/phenotype_names.pkl", "rb") as file:
         phenotype_name = pickle.load(file)
 
     return phenotype_name.get(phenotype_id)
