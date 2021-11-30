@@ -1,4 +1,4 @@
-orthologs: 197
+orthologs: 162
 totalgenes: 12
 organism: zebrafish
 Affected Term	P-value	n	m	i	rank	q-value	Enriched Phenotype	Overlap Genes

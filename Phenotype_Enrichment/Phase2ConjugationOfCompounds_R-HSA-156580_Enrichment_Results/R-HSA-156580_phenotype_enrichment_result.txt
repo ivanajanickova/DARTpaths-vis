@@ -1,5 +1,5 @@
 Orthologs,Total Genes in Pathway,Species
-140,111,mouse
+117,111,mouse
 257,111,slimemould
 1715,111,celegans
 555,111,zebrafish

@@ -1,6 +1,6 @@
 Orthologs,Total Genes in Pathway,Species
 2,7,slimemould
-8,7,celegans
-10,7,zebrafish
+7,7,celegans
+9,7,zebrafish
 12,7,dmelanogaster
 8,7,mouse

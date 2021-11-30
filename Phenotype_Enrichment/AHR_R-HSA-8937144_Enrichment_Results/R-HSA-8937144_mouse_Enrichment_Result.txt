@@ -1,4 +1,4 @@
-orthologs: 8
+orthologs: 7
 totalgenes: 7
 organism: mouse
 Enriched Phenotype	Phenotype Name	P-value	n	m	i	rank	q-value	Overlap Genes

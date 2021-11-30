@@ -1,4 +1,4 @@
-orthologs: 546
+orthologs: 484
 totalgenes: 12
 organism: celegans
 Enriched Phenotype	Phenotype Name	P-value	n	m	i	rank	q-value	Overlap Genes
