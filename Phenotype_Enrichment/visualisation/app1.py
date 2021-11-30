@@ -22,7 +22,7 @@ def expand_dataframe(df: pd.DataFrame):
     :param df: dataframe to expand
     """
     df_1 = df.assign(phenotype=df['Enriched_Phenotypes'].astype(str).str.split(',')).explode('Enriched_Phenotypes')
-    df_2 = df_1[['Orthlog_Genes', 'Human_Gene', 'Organism', 'Enriched_Phenotypes']]
+    df_2 = df_1[['Ortholog_Genes', 'Human_Gene', 'Organism', 'Enriched_Phenotypes']]
     # get total number of genes
     n_genes = set(df['Human_Gene'].tolist())
     n = len(n_genes)  # total number of genes
@@ -53,7 +53,7 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
         # source node is human gene
         gene = str(row['Human_Gene'])
         # target node is ortholog
-        ortholog = str(row['Orthlog_Genes'])
+        ortholog = str(row['Ortholog_Genes'])
         phenotype = str(row['Enriched_Phenotypes'])
         organism = str(row['Organism'])
         # add data and class info to the nodes
