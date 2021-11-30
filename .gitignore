@@ -28,3 +28,9 @@
 /Phenotype_Enrichment/EthanolOxidation_R-HSA-211945_Enrichment_Results/
 /Phenotype_Enrichment/Phase1CompundFunctionalization_R-HSA-211945_Enrichment_Results/
 /Phenotype_Enrichment/Phase2ConjugationOfCompounds_R-HSA-156580_Enrichment_Results/
+
+# folders for enrichment
+/DARTpaths/
+/databases/
+/phenotype term/
+/.idea/
