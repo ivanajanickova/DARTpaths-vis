@@ -1,8 +1,0 @@
-[ $# -ge 1 -a -f "$1" ] && input="$1" || input="-"
-
-ids="$(awk -F "\t" -v OFS="\t" '{print $1}' $input | sort -u)"
-
-while read -r line
-do
-	echo "$(blastdbcmd -db ${HOME}/DARTpaths/software/blastdb/string_proteins -entry $line)"
-done <<< "$ids"
