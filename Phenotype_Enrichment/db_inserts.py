@@ -10,11 +10,11 @@ import psycopg2
 class DatabaseInserts:
 
     def __init__(self):
-        self.conn = psycopg2.connect(user="wahiiuuseanslh",
-                                     password="3370a0e2c90b0d8eb13192a4de38b57556f0e98bc083e50d9157dd82b4d12619",
-                                     host="ec2-54-171-25-232.eu-west-1.compute.amazonaws.com",
+        self.conn = psycopg2.connect(user="lfxnboorsrhevw",
+                                     password="4322a747d9e7b86cb62c2ef1e44b338a9fe059ce99cf6d662278fd21ed06e388",
+                                     host="ec2-54-216-159-235.eu-west-1.compute.amazonaws.com",
                                      port="5432",
-                                     database="d8re051vcjq8v1")
+                                     database="dft1uk8fl9qnpb")
         self.cursor = self.conn.cursor()
 
     def close_connection(self):

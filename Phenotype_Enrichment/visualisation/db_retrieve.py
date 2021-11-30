@@ -7,11 +7,11 @@ import pandas as pd
 def select_from_pathway_genes(pathway_name: str) -> List[str]:
     genes = []
     try:
-        conn = psycopg2.connect(user="wahiiuuseanslh",
-                                password="3370a0e2c90b0d8eb13192a4de38b57556f0e98bc083e50d9157dd82b4d12619",
-                                host="ec2-54-171-25-232.eu-west-1.compute.amazonaws.com",
+        conn = psycopg2.connect(user="lfxnboorsrhevw",
+                                password="4322a747d9e7b86cb62c2ef1e44b338a9fe059ce99cf6d662278fd21ed06e388",
+                                host="ec2-54-216-159-235.eu-west-1.compute.amazonaws.com",
                                 port="5432",
-                                database="d8re051vcjq8v1")
+                                database="dft1uk8fl9qnpb")
         cursor = conn.cursor()
         postgreSQL_select_Query = "SELECT GENES FROM PATHWAY_GENES WHERE PATHWAY_NAME = %s"
         cursor.execute(postgreSQL_select_Query, (pathway_name,))
@@ -38,11 +38,11 @@ def select_from_enrichment_results(pathway_name: str) -> pd.DataFrame:
     enriched_phenotypes = []
     result = pd.DataFrame()
     try:
-        conn = psycopg2.connect(user="wahiiuuseanslh",
-                                     password="3370a0e2c90b0d8eb13192a4de38b57556f0e98bc083e50d9157dd82b4d12619",
-                                     host="ec2-54-171-25-232.eu-west-1.compute.amazonaws.com",
-                                     port="5432",
-                                     database="d8re051vcjq8v1")
+        conn = psycopg2.connect(user="lfxnboorsrhevw",
+                                password="4322a747d9e7b86cb62c2ef1e44b338a9fe059ce99cf6d662278fd21ed06e388",
+                                host="ec2-54-216-159-235.eu-west-1.compute.amazonaws.com",
+                                port="5432",
+                                database="dft1uk8fl9qnpb")
         cursor = conn.cursor()
         postgreSQL_select_Query = "SELECT * FROM ENRICHMENT_RESULTS WHERE HUMAN_GENE = %s"
         for gene in genes:
@@ -83,11 +83,11 @@ def find_top_level_pathway(pathway_name: str) -> str:
     """
     top_level_pathway = ""
     try:
-        conn = psycopg2.connect(user="wahiiuuseanslh",
-                                     password="3370a0e2c90b0d8eb13192a4de38b57556f0e98bc083e50d9157dd82b4d12619",
-                                     host="ec2-54-171-25-232.eu-west-1.compute.amazonaws.com",
-                                     port="5432",
-                                     database="d8re051vcjq8v1")
+        conn = psycopg2.connect(user="lfxnboorsrhevw",
+                                password="4322a747d9e7b86cb62c2ef1e44b338a9fe059ce99cf6d662278fd21ed06e388",
+                                host="ec2-54-216-159-235.eu-west-1.compute.amazonaws.com",
+                                port="5432",
+                                database="dft1uk8fl9qnpb")
         cursor = conn.cursor()
         postgreSQL_select_Query = "SELECT TOP_LEVEL_PATHWAY FROM PATHWAY_HIERARCHY WHERE %s = ANY(LOW_LEVEL_PATHWAY)"
         cursor.execute(postgreSQL_select_Query, (pathway_name,))
@@ -110,11 +110,11 @@ def select_from_metadata(pathway_name: str) -> dict:
     """
     dict_metadata = {}
     try:
-        conn = psycopg2.connect(user="wahiiuuseanslh",
-                                     password="3370a0e2c90b0d8eb13192a4de38b57556f0e98bc083e50d9157dd82b4d12619",
-                                     host="ec2-54-171-25-232.eu-west-1.compute.amazonaws.com",
-                                     port="5432",
-                                     database="d8re051vcjq8v1")
+        conn = psycopg2.connect(user="lfxnboorsrhevw",
+                                password="4322a747d9e7b86cb62c2ef1e44b338a9fe059ce99cf6d662278fd21ed06e388",
+                                host="ec2-54-216-159-235.eu-west-1.compute.amazonaws.com",
+                                port="5432",
+                                database="dft1uk8fl9qnpb")
         cursor = conn.cursor()
         postgreSQL_select_Query = "SELECT * FROM PHENOTYPE_METADATA WHERE PATHWAY = %s"
         cursor.execute(postgreSQL_select_Query, (pathway_name,))
