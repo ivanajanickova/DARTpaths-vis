@@ -1,5 +1,0 @@
-orthologs: 140
-totalgenes: 9
-organism: mouse
-Enriched Phenotype	Phenotype Name	P-value	n	m	i	rank	q-value	Overlap Genes
-MP:0009908	protruding tongue	0.00033888731903454223	7	7019	2	1	0.0007936507936507937	Slc35d1,Slc26a2
