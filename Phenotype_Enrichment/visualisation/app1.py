@@ -129,9 +129,9 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
 #--------------------------------------------
 # load data -------------------------------
 # upper level
-upper_df1 = db_retrieve.select_from_enrichment_results("Phase1CompundFunctionalization")
+upper_df1 = db_retrieve.select_from_enrichment_results("Phase1CompoundFunctionalization")
 upper_df_1, upper_N_genes_1 = expand_dataframe(upper_df1)
-metadata = db_retrieve.select_from_metadata("Phase1CompundFunctionalization")
+metadata = db_retrieve.select_from_metadata("Phase1CompoundFunctionalization")
 
 # lower level
 gene_df1 = db_retrieve.select_from_enrichment_results("AHR")               #gene_df1
@@ -151,21 +151,21 @@ gene_df_4, N_genes_4 = expand_dataframe(gene_df2)
 metadata4 = db_retrieve.select_from_metadata("AminoAcidConjugation")              #metadata2
 
 path_list = ['AHR', 'Amino Oxidase', 'Ethanol Oxidation', 'AminoAcid Conjugation']  #add
-#Phase1CompundFunctionalization
-gene_df5 = db_retrieve.select_from_enrichment_results("Phase1CompundFunctionalization")     #gene_df5
-gene_df_5, N_genes_5 = expand_dataframe(gene_df5)
-metadata5 = db_retrieve.select_from_metadata("Phase1CompundFunctionalization")              #metadata5
+
 
 nodes, edges = load_info_to_graph(upper_df_1, metadata, upper_N_genes_1)
-
 nodes1, edges1 = load_info_to_graph(gene_df_1, metadata1, N_genes_1)
 nodes2, edges2 = load_info_to_graph(gene_df_2, metadata2, N_genes_2)
 nodes3, edges3 = load_info_to_graph(gene_df_3, metadata3, N_genes_3)
 nodes4, edges4 = load_info_to_graph(gene_df_4, metadata4, N_genes_4)
-nodes5, edges5 = load_info_to_graph(gene_df_5, metadata5, N_genes_5)
 
 element = edges + nodes
-new_element = edges1 + nodes1
+new_element1 = edges1 + nodes1
+new_element2 = edges2 + nodes2
+new_element3 = edges3 + nodes3
+new_element4 = edges4 + nodes4
+new_elements = [element, new_element1, new_element2, new_element3, new_element4]
+
 #organism = ['celegans', 'zebrafish', 'mouse', 'dmelanogaster']
 organism = ['dmelanogaster','mouse','celegans','zebrafish']
 # https://plotly.com/python/discrete-color/
@@ -194,7 +194,7 @@ org_totalPhenotype_1 = calculate_no_phenotypes(gene_df_1)
 org_totalPhenotype_2 = calculate_no_phenotypes(gene_df_2)
 org_totalPhenotype_3 = calculate_no_phenotypes(gene_df_3)
 org_totalPhenotype_4 = calculate_no_phenotypes(gene_df_4)
-org_totalPhenotype_5 = calculate_no_phenotypes(gene_df_5)
+totalPhenotypes = [org_totalPhenotype_1, org_totalPhenotype_2, org_totalPhenotype_3, org_totalPhenotype_4]
 # --------------------------------------------------------------------------------
 
 graph_stylesheet = [
@@ -412,6 +412,10 @@ body_layout = dbc.Container(
                         dbc.Label('Search phenotype for a gene: ', html_for='gene_search'),
                         dbc.Input(type='password', id='gene_search', placeholder="Enter a gene ID here"),
                         dbc.FormText('The gene is not available in the pathway', color='secondary'),
+
+                        html.Div(style={'padding': 7}),
+                        dbc.Button("Search", id="search-button", className="me-2", n_clicks=0, size="sm",color="secondary"),
+                        html.Span(id="search-status", style={"verticalAlign": "middle"}),
                         html.Div(style={'padding': 20}), #Space
 
                         dbc.Row(
@@ -465,9 +469,9 @@ body_layout = dbc.Container(
                             multi=True,
                             style={"width": "100%"},
                         ),
-                        html.Div(style={'padding': 7}),
-                        dbc.Button("Search", id="search-button", className="me-2", n_clicks=0, size="sm",color="secondary"),
-                        html.Span(id="search-status", style={"verticalAlign": "middle"}),
+                        #html.Div(style={'padding': 7}),
+                        #dbc.Button("Search", id="search-button", className="me-2", n_clicks=0, size="sm",color="secondary"),
+                        #html.Span(id="search-status", style={"verticalAlign": "middle"}),
                         html.Div(style={'padding': 20}),  #Space
 
                         html.H4(dbc.Badge(
@@ -520,23 +524,23 @@ def display_nodeData(data):
     else:
         return contents
 #-----------------------------------------------
-@app.callback(
-    [Output('cytoscape-phenotype', "elements"),
-     Output('Lowest_Level','options'),
-     Output('organism_dropdown', 'value'),
-     ],
-    [Input('pathway_level', 'value')]
-)
-def filter_nodes_1(value):
-    if value == 1:
-        options = [{"label": name, "value": name}
-                   for name in path_list]   # change
-        value = [{"label": i + " (" + str(v) + " phenotype(s))", "value": i} for i, v in org_totalPhenotype_1.items()]
-        return new_element, options, value
-    if value == 2:
-        options = [{"label": name , "value": name } for name in ['']] #check
-        value = [{"label": i + " (" + str(v) + " phenotype(s))", "value": i} for i, v in org_totalPhenotype.items()]
-        return element, options, value
+# @app.callback(
+#     [Output('cytoscape-phenotype', "elements"),
+#      Output('Lowest_Level','options'),
+#      Output('organism_dropdown', 'value'),
+#      ],
+#     [Input('pathway_level', 'value')]
+# )
+# def filter_nodes_1(value):
+#     if value == 1:
+#         options = [{"label": name, "value": name}
+#                    for name in path_list]   # change
+#         value = [{"label": i + " (" + str(v) + " phenotype(s))", "value": i} for i, v in org_totalPhenotype_1.items()]
+#         return new_element, options, value
+#     if value == 2:
+#         options = [{"label": name , "value": name } for name in ['']] #check
+#         value = [{"label": i + " (" + str(v) + " phenotype(s))", "value": i} for i, v in org_totalPhenotype.items()]
+#         return element, options, value
 #----------------------------------------------------------------
 
 #TRIAL2
@@ -624,7 +628,42 @@ def filter_nodes_1(value):
 #     #org_totalPhenotype = calculate_no_phenotypes(df)
 #     return edge + node
 
-
+@app.callback(
+    [Output('cytoscape-phenotype', "elements"),
+     Output('organism_dropdown', 'value'),
+     ],
+    [Input('pathway_level', 'value'),
+     Input('Lowest_Level', 'value')]
+)
+def filter_nodes_1(UpLow, LowLevel):
+    new_element = new_elements[0]
+    if UpLow == 1:
+        new_element = new_elements[1]
+        if LowLevel == path_list[0]:
+            new_element = new_elements[1]
+            org_totalPhenotypeLOW = totalPhenotypes[0]
+            value = [{"label": i + " (" + str(v) + " phenotype(s))", "value": i} for i, v in org_totalPhenotypeLOW.items()]
+            return new_element, value
+        elif LowLevel == path_list[1]:
+            new_element = new_elements[2]
+            org_totalPhenotypeLOW = totalPhenotypes[1]
+            value = [{"label": i + " (" + str(v) + " phenotype(s))", "value": i} for i, v in org_totalPhenotypeLOW.items()]
+            return new_element, value
+        elif LowLevel == path_list[2]:
+            new_element = new_elements[3]
+            org_totalPhenotypeLOW = totalPhenotypes[2]
+            value = [{"label": i + " (" + str(v) + " phenotype(s))", "value": i} for i, v in org_totalPhenotypeLOW.items()]
+            return new_element, value
+        elif LowLevel == path_list[3]:
+            new_element = new_elements[4]
+            org_totalPhenotypeLOW = totalPhenotypes[3]
+            value = [{"label": i + " (" + str(v) + " phenotype(s))", "value": i} for i, v in org_totalPhenotypeLOW.items()]
+            return new_element, value
+        return new_element
+    elif UpLow == 2:
+        new_element = new_elements[0]
+        value = [{"label": i + " (" + str(v) + " phenotype(s))", "value": i} for i, v in org_totalPhenotype.items()]
+        return new_element, value
 #----------------------------------------------
 if __name__ == '__main__':
     app.run_server(debug=False)  # set false so you can load bigger networks
