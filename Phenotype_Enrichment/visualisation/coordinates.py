@@ -50,7 +50,7 @@ def check_coordinates(coordinates, coordinate_float, total_genes, x1, x2, x3, x4
     """
 
     # adjust the coordinates in case a network is large
-    if total_genes >= 50:
+    if total_genes >= 20:
         x1 = x1*10
         x2 = x2*10
         x3 = x3*10
