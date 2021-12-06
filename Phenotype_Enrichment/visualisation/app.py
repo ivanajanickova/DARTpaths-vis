@@ -32,6 +32,7 @@ def expand_dataframe(df: pd.DataFrame):
     """
     df_1 = df.assign(phenotype=df['Enriched_Phenotypes'].astype(str).str.split(',')).explode('Enriched_Phenotypes')
     df_2 = df_1[['Ortholog_Genes', 'Human_Gene', 'Organism', 'Enriched_Phenotypes']]
+    df_2 = df_2.dropna()
     # get total number of genes
     n_genes = set(df['Human_Gene'].tolist())
     n = len(n_genes)  # total number of genes
