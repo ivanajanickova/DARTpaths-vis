@@ -141,7 +141,9 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
     return nodes_list, edges_list
 
 
-# ## Load Data:
+# ## Load Data: first get the data from the database (db_retrieve);
+# then create a df with the function expand_dataframe
+# then load the metadata
 # * The list of pathways we have so far:
 #     * Phase2ConjugationOfCompounds (highest)
 #     * Phase1CompundFunctionalization (1 level down)
@@ -176,9 +178,11 @@ gene_df_4, N_genes_4 = expand_dataframe(gene_df4)
 metadata4 = db_retrieve.select_from_metadata("EthanolOxidation")  # metadata4
 
 # list of the possible pathways:
+# add pathways to this list, when you add more pathways
 path_list = ['AHR', 'Amino Oxidase', 'Ethanol Oxidation', 'AminoAcid Conjugation']  # add
 
 # nodes & edges: for each pathway
+# for each dataframe and metadata, create the nodes and edges with the function load_info_to_graph
 nodes, edges = load_info_to_graph(upper_df_1, metadata, upper_N_genes_1)  # upper level
 nodes1, edges1 = load_info_to_graph(gene_df_1, metadata1, N_genes_1)
 nodes2, edges2 = load_info_to_graph(gene_df_2, metadata2, N_genes_2)
@@ -186,13 +190,14 @@ nodes3, edges3 = load_info_to_graph(gene_df_3, metadata3, N_genes_3)
 nodes4, edges4 = load_info_to_graph(gene_df_4, metadata4, N_genes_4)
 
 # create an element for each pathway, contains the nodes and elements:
+# this is 1 element for each possible graph, with both edges and nodes
 element = nodes + edges
 new_element1 = nodes1 + edges1
 new_element2 = nodes2 + edges2
 new_element3 = nodes3 + edges3
 new_element4 = nodes4 + edges4
 
-# list of all the elements
+# list of all the elements:
 new_elements = [element, new_element1, new_element2, new_element3, new_element4]
 
 
@@ -214,8 +219,8 @@ def edgesNnodes_HG(els, human_gene):
     """
     Function to find the nodes and edges for a human gene -> needed for the search function
 
-    :param els:
-    :param human gene:
+    :param els: elements = edges + nodes
+    :param human gene: input form the search bar -> string with 'ENSG'-number
     """
     set_edges = []
     set_nodes = []
@@ -267,10 +272,10 @@ def edgesNnodes_HG(els, human_gene):
 
 def edgesNnodes_Ortholog(els, ortholog):
     """
-    Function to find the nodes and edges for ortholog -> needed for the selection
+    Function to find the nodes and edges for ortholog -> needed for the ortholog selection
 
-    :param els:
-    :param ortholog:
+    :param els: element = edges + nodes
+    :param ortholog: possible ortholog (mouse, zebrafish, celegans, dmelanogaster)
     """
     ortholog_nodes = []
     ortholog_edges = []
@@ -316,7 +321,7 @@ def edgesNnodes_Ortholog(els, ortholog):
     return ortholog_edges, ortholog_nodes
 
 
-# ## make list of the nodes for each organism -> less time consuming then calculate when app is running
+# ## make list of the nodes for each organism -> less time consuming than calculate when app is running
 # dmelanogaster
 ED, ND = edgesNnodes_Ortholog(new_elements[0], 'dmelanogaster')
 ED1, ND1 = edgesNnodes_Ortholog(new_elements[1], 'dmelanogaster')
@@ -353,8 +358,6 @@ col_swatch = [px.colors.qualitative.Safe[8], px.colors.qualitative.Set1[2],
 
 
 # ## Function to caluculate the number of phenotypes
-
-
 def calculate_no_phenotypes(df):
     """
     calculate the right phenotype number
@@ -369,7 +372,7 @@ def calculate_no_phenotypes(df):
     org_totalPhenotype = dict(zip(organism, totalPhenotype))
     return org_totalPhenotype
 
-
+# total number of phenotypes for each graph:
 org_totalPhenotype = calculate_no_phenotypes(upper_df1)
 org_totalPhenotype_1 = calculate_no_phenotypes(gene_df_1)
 org_totalPhenotype_2 = calculate_no_phenotypes(gene_df_2)
@@ -379,7 +382,6 @@ org_totalPhenotype_4 = calculate_no_phenotypes(gene_df_4)
 totalPhenotypes = [org_totalPhenotype_1, org_totalPhenotype_2, org_totalPhenotype_3, org_totalPhenotype_4]
 
 # ## Define app:
-
 graph_stylesheet = [
 
     # colours based on organism
@@ -702,6 +704,18 @@ def display_nodeData(data):
 def select_organism(value_orth, UpLow, LowLevel, n, hg_value):
     # change the click on the search button:
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]  # To determine if n_clicks is changed.
+
+#overview:
+    # first start by looking if there you look for 1 organism or more
+    # then see if you are in the upper or the lower level
+    # UPPER -> you cannot choose a lower level (in sub level) -> only use the graph of the upper leve
+    # if there is no search -> give whole graph
+    # if there is a search -> give the graph by using the function edgesNnodes_HG (give the edges and the nodes for that human gene)
+    # if the gene is no found -> give: "The gene you were looking for was not found"
+
+    # LOWER -> first check in which pathway you are -> go through pathway_list
+    # then the options are the same as in UPPER LEVEL:
+    # 1) no search = whole graph, 2) search = edgesNnodes_HG; 3) not fount = text
 
     if value_orth == 'all organisms':
         if UpLow == 1:
