@@ -23,9 +23,12 @@
 
 * go to `Phenotype_Enrichment/visualisation/`
 * run `app.py`
+* on an average laptop, this step will take ~ 15-20 minutes
 * click on the link that appears
 
 
 ## Troubleshooting
 * Windows users can experience issues with the `run_enrichment_for_pathways.sh` since the `Python_APRIL_2021_phenotype_enrichment.py` is not optimised for Windows machines
 * We recommend running this step on Linux machine
+* You may have to install some of the packages from requirements.txt manually
+
