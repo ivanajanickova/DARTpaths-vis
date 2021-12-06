@@ -357,31 +357,6 @@ organism = ['dmelanogaster', 'mouse', 'celegans', 'zebrafish']
 col_swatch = [px.colors.qualitative.Safe[8], px.colors.qualitative.Set1[2],
               px.colors.qualitative.Set1[7], px.colors.qualitative.Set1[4]]
 
-
-# ## Function to caluculate the number of phenotypes
-def calculate_no_phenotypes(df):
-    """
-    calculate the right phenotype number
-
-    :param df: pathway dataframe we want to calculate this for
-    """
-    no_celegans = (df.groupby(['Organism']).count())['Enriched_Phenotypes'][0]
-    no_dmelanogaster = (df.groupby(['Organism']).count())['Enriched_Phenotypes'][1]
-    no_mouse = (df.groupby(['Organism']).count())['Enriched_Phenotypes'][2]
-    no_zebrafish = (df.groupby(['Organism']).count())['Enriched_Phenotypes'][3]
-    totalPhenotype = [no_celegans, no_dmelanogaster, no_mouse, no_zebrafish]
-    org_totalPhenotype = dict(zip(organism, totalPhenotype))
-    return org_totalPhenotype
-
-# total number of phenotypes for each graph:
-org_totalPhenotype = calculate_no_phenotypes(upper_df1)
-org_totalPhenotype_1 = calculate_no_phenotypes(gene_df_1)
-org_totalPhenotype_2 = calculate_no_phenotypes(gene_df_2)
-org_totalPhenotype_3 = calculate_no_phenotypes(gene_df_3)
-org_totalPhenotype_4 = calculate_no_phenotypes(gene_df_4)
-
-totalPhenotypes = [org_totalPhenotype_1, org_totalPhenotype_2, org_totalPhenotype_3, org_totalPhenotype_4]
-
 # ## Define app:
 graph_stylesheet = [
 
