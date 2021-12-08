@@ -168,19 +168,14 @@ gene_df2 = db_retrieve.select_from_enrichment_results("AmineOxidase")  # gene_df
 gene_df_2, N_genes_2 = expand_dataframe(gene_df2)
 metadata2 = db_retrieve.select_from_metadata("AmineOxidase")  # metadata2
 
-# AminoAcidConjugation
-gene_df3 = db_retrieve.select_from_enrichment_results("AminoAcidConjugation")  # gene_df3
-gene_df_3, N_genes_3 = expand_dataframe(gene_df3)
-metadata3 = db_retrieve.select_from_metadata("AminoAcidConjugation")  # metadata3
-
 # EthanolOxidation
-gene_df4 = db_retrieve.select_from_enrichment_results("EthanolOxidation")  # gene_df4
-gene_df_4, N_genes_4 = expand_dataframe(gene_df4)
-metadata4 = db_retrieve.select_from_metadata("EthanolOxidation")  # metadata4
+gene_df3 = db_retrieve.select_from_enrichment_results("EthanolOxidation")  # gene_df4
+gene_df_3, N_genes_3 = expand_dataframe(gene_df3)
+metadata3 = db_retrieve.select_from_metadata("EthanolOxidation")  # metadata4
 
 # list of the possible pathways:
 # add pathways to this list, when you add more pathways
-path_list = ['AHR', 'Amino Oxidase', 'Ethanol Oxidation', 'AminoAcid Conjugation']  # add
+path_list = ['AHR', 'Amino Oxidase', 'Ethanol Oxidation']  # add
 
 # nodes & edges: for each pathway
 # for each dataframe and metadata, create the nodes and edges with the function load_info_to_graph
@@ -188,7 +183,6 @@ nodes, edges = load_info_to_graph(upper_df_1, metadata, upper_N_genes_1)  # uppe
 nodes1, edges1 = load_info_to_graph(gene_df_1, metadata1, N_genes_1)
 nodes2, edges2 = load_info_to_graph(gene_df_2, metadata2, N_genes_2)
 nodes3, edges3 = load_info_to_graph(gene_df_3, metadata3, N_genes_3)
-nodes4, edges4 = load_info_to_graph(gene_df_4, metadata4, N_genes_4)
 
 # create an element for each pathway, contains the nodes and elements:
 # this is 1 element for each possible graph, with both edges and nodes
@@ -196,10 +190,10 @@ element = nodes + edges
 new_element1 = nodes1 + edges1
 new_element2 = nodes2 + edges2
 new_element3 = nodes3 + edges3
-new_element4 = nodes4 + edges4
+
 
 # list of all the elements:
-new_elements = [element, new_element1, new_element2, new_element3, new_element4]
+new_elements = [element, new_element1, new_element2, new_element3]
 
 
 def find_human_genes(elements):
@@ -328,27 +322,24 @@ ED, ND = edgesNnodes_Ortholog(new_elements[0], 'dmelanogaster')
 ED1, ND1 = edgesNnodes_Ortholog(new_elements[1], 'dmelanogaster')
 ED2, ND2 = edgesNnodes_Ortholog(new_elements[2], 'dmelanogaster')
 ED3, ND3 = edgesNnodes_Ortholog(new_elements[3], 'dmelanogaster')
-ED4, ND4 = edgesNnodes_Ortholog(new_elements[4], 'dmelanogaster')
 
 # mouse
 EM, NM = edgesNnodes_Ortholog(new_elements[0], 'mouse')
 EM1, NM1 = edgesNnodes_Ortholog(new_elements[1], 'mouse')
 EM2, NM2 = edgesNnodes_Ortholog(new_elements[2], 'mouse')
 EM3, NM3 = edgesNnodes_Ortholog(new_elements[3], 'mouse')
-EM4, NM4 = edgesNnodes_Ortholog(new_elements[4], 'mouse')
+
 # celegans
 EC, NC = edgesNnodes_Ortholog(new_elements[0], 'celegans')
 EC1, NC1 = edgesNnodes_Ortholog(new_elements[1], 'celegans')
 EC2, NC2 = edgesNnodes_Ortholog(new_elements[2], 'celegans')
 EC3, NC3 = edgesNnodes_Ortholog(new_elements[3], 'celegans')
-EC4, NC4 = edgesNnodes_Ortholog(new_elements[4], 'celegans')
 
 # zebrafish
 EZ, NZ = edgesNnodes_Ortholog(new_elements[0], 'zebrafish')
 EZ1, NZ1 = edgesNnodes_Ortholog(new_elements[1], 'zebrafish')
 EZ2, NZ2 = edgesNnodes_Ortholog(new_elements[2], 'zebrafish')
 EZ3, NZ3 = edgesNnodes_Ortholog(new_elements[3], 'zebrafish')
-EZ4, NZ4 = edgesNnodes_Ortholog(new_elements[4], 'zebrafish')
 
 # ## Define organism and colors
 # organisms list:
@@ -740,21 +731,6 @@ def select_organism(value_orth, UpLow, LowLevel, n, hg_value):
                     else:
                         text = "The gene you were looking for was not found"
                         return elements, text
-            elif LowLevel == path_list[3]:
-                elements = edges4 + nodes4
-                if 'search-button' not in changed_id:
-                    text = "Enter a value and press Search"
-                    return elements, text
-                else:
-                    hg = "{}".format(hg_value)
-                    if str(hg) in find_human_genes(elements):
-                        edgesHG, nodesHG = edgesNnodes_HG(elements, hg)
-                        el = edgesHG + nodesHG
-                        text = "you searched for: " + hg
-                        return el, text
-                    else:
-                        text = "The gene you were looking for was not found"
-                        return elements, text
             elements = edges1 + nodes1
             if 'search-button' not in changed_id:
                 text = "Enter a value and press Search"
@@ -818,21 +794,6 @@ def select_organism(value_orth, UpLow, LowLevel, n, hg_value):
                         return elements, text
             elif LowLevel == path_list[2]:
                 elements = ED3 + ND3
-                if 'search-button' not in changed_id:
-                    text = "Enter a value and press Search"
-                    return elements, text
-                else:
-                    hg = "{}".format(hg_value)
-                    if str(hg) in find_human_genes(elements):
-                        edgesHG, nodesHG = edgesNnodes_HG(elements, hg)
-                        el = edgesHG + nodesHG
-                        text = "you searched for: " + hg
-                        return el, text
-                    else:
-                        text = "The gene you were looking for was not found"
-                        return elements, text
-            elif LowLevel == path_list[3]:
-                elements = ED4 + ND4
                 if 'search-button' not in changed_id:
                     text = "Enter a value and press Search"
                     return elements, text
@@ -922,21 +883,6 @@ def select_organism(value_orth, UpLow, LowLevel, n, hg_value):
                     else:
                         text = "The gene you were looking for was not found"
                         return elements, text
-            elif LowLevel == path_list[3]:
-                elements = EM4 + NM4
-                if 'search-button' not in changed_id:
-                    text = "Enter a value and press Search"
-                    return elements, text
-                else:
-                    hg = "{}".format(hg_value)
-                    if str(hg) in find_human_genes(elements):
-                        edgesHG, nodesHG = edgesNnodes_HG(elements, hg)
-                        el = edgesHG + nodesHG
-                        text = "you searched for: " + hg
-                        return el, text
-                    else:
-                        text = "The gene you were looking for was not found"
-                        return elements, text
             elements = EM1 + NM1
             if 'search-button' not in changed_id:
                 text = "Enter a value and press Search"
@@ -1013,21 +959,6 @@ def select_organism(value_orth, UpLow, LowLevel, n, hg_value):
                     else:
                         text = "The gene you were looking for was not found"
                         return elements, text
-            elif LowLevel == path_list[3]:
-                elements = EC4 + NC4
-                if 'search-button' not in changed_id:
-                    text = "Enter a value and press Search"
-                    return elements, text
-                else:
-                    hg = "{}".format(hg_value)
-                    if str(hg) in find_human_genes(elements):
-                        edgesHG, nodesHG = edgesNnodes_HG(elements, hg)
-                        el = edgesHG + nodesHG
-                        text = "you searched for: " + hg
-                        return el, text
-                    else:
-                        text = "The gene you were looking for was not found"
-                        return elements, text
             elements = EC1 + NC1
             if 'search-button' not in changed_id:
                 text = "Enter a value and press Search"
@@ -1035,7 +966,7 @@ def select_organism(value_orth, UpLow, LowLevel, n, hg_value):
             else:
                 hg = "{}".format(hg_value)
                 for i in list(range(0, len(elements))):
-                    if elements[i].get('data').get('label') == str(hg):
+                    if str(hg) in find_human_genes(elements):
                         edgesHG, nodesHG = edgesNnodes_HG(elements, hg)
                         el = edgesHG + nodesHG
                         text = "you searched for: " + hg
@@ -1051,7 +982,7 @@ def select_organism(value_orth, UpLow, LowLevel, n, hg_value):
             else:
                 hg = "{}".format(hg_value)
                 for i in list(range(0, len(elements))):
-                    if elements[i].get('data').get('label') == str(hg):
+                    if str(hg) in find_human_genes(elements):
                         edgesHG, nodesHG = edgesNnodes_HG(elements, hg)
                         el = edgesHG + nodesHG
                         text = "you searched for: " + hg
@@ -1106,28 +1037,13 @@ def select_organism(value_orth, UpLow, LowLevel, n, hg_value):
                     else:
                         text = "The gene you were looking for was not found"
                         return elements, text
-            elif LowLevel == path_list[3]:
-                elements = EZ4 + NZ4
-                if 'search-button' not in changed_id:
-                    text = "Enter a value and press Search"
-                    return elements, text
-                else:
-                    hg = "{}".format(hg_value)
-                    if str(hg) in find_human_genes(elements):
-                        edgesHG, nodesHG = edgesNnodes_HG(elements, hg)
-                        el = edgesHG + nodesHG
-                        text = "you searched for: " + hg
-                        return el, text
-                    else:
-                        text = "The gene you were looking for was not found"
-                        return elements, text
             elements = EZ1 + NZ1
             if 'search-button' not in changed_id:
                 text = "Enter a value and press Search"
                 return elements, text
             else:
                 hg = "{}".format(hg_value)
-                if elements[i].get('data').get('label') == str(hg):
+                if str(hg) in find_human_genes(elements):
                     edgesHG, nodesHG = edgesNnodes_HG(elements, hg)
                     el = edgesHG + nodesHG
                     text = "you searched for: " + hg
@@ -1142,7 +1058,7 @@ def select_organism(value_orth, UpLow, LowLevel, n, hg_value):
                 return elements, text
             else:
                 hg = "{}".format(hg_value)
-                if elements[i].get('data').get('label') == str(hg):
+                if str(hg) in find_human_genes(elements):
                     edgesHG, nodesHG = edgesNnodes_HG(elements, hg)
                     el = edgesHG + nodesHG
                     text = "you searched for: " + hg
