@@ -1,6 +1,8 @@
 ## Setting up the repository and environment locally
 ### Clone the repository
 * `git clone https://github.com/ivanajanickova/DARTpaths-vis.git`
+* preferably, start this project in PyCharm or other python IDE
+*
 ### Setting up the python environment
 * `python3 -m venv dart-env`
 * `source dart-env/bin/activate` you need to run this everytime
