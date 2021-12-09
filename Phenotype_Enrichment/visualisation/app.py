@@ -32,7 +32,6 @@ def expand_dataframe(df: pd.DataFrame):
     """
     df_1 = df.assign(phenotype=df['Enriched_Phenotypes'].astype(str).str.split(',')).explode('Enriched_Phenotypes')
     df_2 = df_1[['Ortholog_Genes', 'Human_ID', 'Organism', 'Enriched_Phenotypes', 'Human_Gene']]
-    df_2 = df_2.dropna()
     # get total number of genes
     n_genes = set(df['Human_ID'].tolist())
     n = len(n_genes)  # total number of genes
@@ -72,7 +71,6 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
         organism = str(row['Organism'])
         # add data and class info to the nodes
         # gene node positions
-        # pos_x = 50  # always the same; set to 500 in case of large network
         pos_x, pos_y = coordinates.gene_coordinate(1, n_genes, count_n)
         cy_gene = {'data': {'id': gene,
                             'indent': 'gene',  # add
@@ -113,7 +111,7 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
             nodes_list.append(cy_ortholog)
         edges_list.append(cy_edge)
 
-        if phenotype != "None":  # get rid of None node
+        if phenotype != "nan":  # get rid of None node
             metadata_phenotype = metadata.get(phenotype)  # load metadata
             # phenotype node
             pos_x_phenotype, pos_y_phenotype = coordinates.check_coordinates(coordinates_phenotype, pos_y, n_genes, 0,
