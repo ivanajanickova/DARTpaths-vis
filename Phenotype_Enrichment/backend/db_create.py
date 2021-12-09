@@ -15,6 +15,11 @@ def create_tables():
             TOP_LEVEL_PATHWAY VARCHAR(255) NOT NULL PRIMARY KEY,
             LOW_LEVEL_PATHWAY VARCHAR(255)[])
         """,
+        """
+           CREATE TABLE GENE_NAMES (
+               GENE_ID VARCHAR(255) NOT NULL PRIMARY KEY,
+               NAME VARCHAR(255))
+           """,
 
         """
         CREATE TABLE ENRICHMENT_RESULTS ( 

@@ -79,6 +79,19 @@ class DatabaseInserts:
             print(e)
             print("Failed")
 
+    def insert_into_gene_names(self, genes_names_df: pd.DataFrame) -> None:
+        """Insert into pathway genes table.
+        :param pathway_name: the name of the pathway
+        :param genes_names: a list of unique human gene names that make up the pathway"""
+        for i in range(0, len(genes_names_df)):
+            try:
+                postgres_insert_query = """INSERT INTO GENE_NAMES (GENE_ID, NAME) VALUES (%s,%s)"""
+                record_to_insert = (genes_names_df.iloc[i, 0], genes_names_df.iloc[i, 1])
+                self.cursor.execute(postgres_insert_query, record_to_insert)
+                self.conn.commit()
+            except:
+                print("already exists")
+
     def insert_into_pathway_genes(self, pathway_name: str, genes_names: list) -> None:
         """Insert into pathway genes table.
         :param pathway_name: the name of the pathway

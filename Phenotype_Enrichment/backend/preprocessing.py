@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import List
 from db_inserts import DatabaseInserts
-
+import re
 import pandas as pd
 import pickle
 import os
@@ -187,3 +187,7 @@ def get_phenotype_name(phenotype_id: str) -> str:
         phenotype_name = pickle.load(file)
 
     return phenotype_name.get(phenotype_id)
+
+
+
+
