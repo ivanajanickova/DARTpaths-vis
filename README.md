@@ -25,7 +25,7 @@
 
 * go to `Phenotype_Enrichment/visualisation/`
 * run `app.py`
-* on an average laptop, this step will take ~ 15-20 minutes
+* on an average laptop, this step will take ~ 4-10 minutes
 * click on the link that appears
 
 
