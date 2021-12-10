@@ -524,7 +524,7 @@ body_layout = dbc.Container(
             1. phenotypes and the related orthologs in the organism
             2. Orthologous genes in the organism and its human gene in the same molecular pathway in Reactome.
 
-            Initially, a specific gene can be searched for, based on the 'ENSG' number. This will display the specific graph for that gene.
+            Initially, a specific gene can be searched for, based on its 'ENSG' number or gene name. This will display the specific graph for that gene.
 
             The pathway is divided into two types, upper and lower pathway. This can be chosen at Level of pathway(s). The lowerpathway level consists of several sub-pathways, which can also be chosen.
 
