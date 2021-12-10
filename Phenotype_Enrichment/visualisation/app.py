@@ -31,10 +31,9 @@ def expand_dataframe(df: pd.DataFrame):
     :param df: dataframe to expand
     """
     df_1 = df.assign(phenotype=df['Enriched_Phenotypes'].astype(str).str.split(',')).explode('Enriched_Phenotypes')
-    df_2 = df_1[['Ortholog_Genes', 'Human_Gene', 'Organism', 'Enriched_Phenotypes']]
-    df_2 = df_2.dropna()
+    df_2 = df_1[['Ortholog_Genes', 'Human_ID', 'Organism', 'Enriched_Phenotypes', 'Human_Gene']]
     # get total number of genes
-    n_genes = set(df['Human_Gene'].tolist())
+    n_genes = set(df['Human_ID'].tolist())
     n = len(n_genes)  # total number of genes
 
     return df_2, n
@@ -64,18 +63,18 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
     # Load data into nodes and edges
     for index, row in dataframe.iterrows():
         # source node is human gene
-        gene = str(row['Human_Gene'])
+        gene = str(row['Human_ID'])
+        gene_name = str(row['Human_Gene'])
         # target node is ortholog
         ortholog = str(row['Ortholog_Genes'])
         phenotype = str(row['Enriched_Phenotypes'])
         organism = str(row['Organism'])
         # add data and class info to the nodes
         # gene node positions
-        # pos_x = 50  # always the same; set to 500 in case of large network
         pos_x, pos_y = coordinates.gene_coordinate(1, n_genes, count_n)
         cy_gene = {'data': {'id': gene,
                             'indent': 'gene',  # add
-                            'label': gene,
+                            'label': gene_name,
                             'size': 4,
                             'fontsize': '1.5px'},
                    'classes': 'blue',
@@ -112,7 +111,7 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
             nodes_list.append(cy_ortholog)
         edges_list.append(cy_edge)
 
-        if phenotype != "None":  # get rid of None node
+        if phenotype != "nan":  # get rid of None node
             metadata_phenotype = metadata.get(phenotype)  # load metadata
             # phenotype node
             pos_x_phenotype, pos_y_phenotype = coordinates.check_coordinates(coordinates_phenotype, pos_y, n_genes, 0,
@@ -204,9 +203,13 @@ def find_human_genes(elements):
     """
     human_genes_list = []
     for i in list(range(0, len(elements))):
-        x = str(elements[i].get('data').get('label'))
+        x = str(elements[i].get('data').get('id'))
+        z = str(elements[i].get('data').get('label'))
         if x[0:3] == 'ENS':
             human_genes_list.append(x)
+            human_genes_list.append(z)
+
+
     return human_genes_list
 
 
@@ -224,12 +227,28 @@ def edgesNnodes_HG(els, human_gene):
     # find edges and nodes the the human gene
     for i in list(range(0, len(els))):
         x = els[i]
+
+        # when human_gene is gene_name:
+        if els[i].get('data').get('label') == str(human_gene):
+            ens_gene = str(els[i].get('data').get('id'))
+            #nodes
+            set_nodes.append(x)
+            #edges
+            for j in list(range(0, len(els))):
+                t = els[j]
+                if els[j].get('data').get('source') == ens_gene:
+                    set_edges.append(t)
+
+
+        # when human_gene = ensg number
+        # nodes
+        if els[i].get('data').get('id') == str(human_gene):
+            set_nodes.append(x)
+
         # edges
         if els[i].get('data').get('source') == str(human_gene):
             set_edges.append(x)
-        # nodes
-        if els[i].get('data').get('label') == str(human_gene):
-            set_nodes.append(x)
+
 
     # find the orthologs names from the human genes
     for j in list(range(0, len(set_edges))):
@@ -245,7 +264,7 @@ def edgesNnodes_HG(els, human_gene):
             if els[i].get('data').get('source') == ortholog_names[j]:
                 set_edges.append(z)
             # nodes
-            if els[i].get('data').get('label') == ortholog_names[j]:
+            if els[i].get('data').get('id') == ortholog_names[j]:
                 set_nodes.append(z)
 
     # find the phenotyes names
@@ -259,7 +278,7 @@ def edgesNnodes_HG(els, human_gene):
         z = els[i]
         for j in list(range(0, len(phenotype_names))):
             # nodes
-            if els[i].get('data').get('label') == phenotype_names[j]:
+            if els[i].get('data').get('id') == phenotype_names[j]:
                 set_nodes.append(z)
 
     return set_edges, set_nodes
@@ -307,7 +326,7 @@ def edgesNnodes_Ortholog(els, ortholog):
     for i in list(range(0, len(els))):
         a = els[i]
         for j in list(range(0, len(hg_names))):
-            if els[i].get('data').get('label') == hg_names[j]:
+            if els[i].get('data').get('id') == hg_names[j]:
                 ortholog_nodes.append(a)  # nodes of hg
         for h in list(range(0, len(phenotype_names))):
             if els[i].get('data').get('label') == phenotype_names[h]:
@@ -646,7 +665,8 @@ def display_nodeData(data):
             contents.append(html.P('Phenotype enrichment P-value: ' + str(data.get('metadata')[4])))
             return contents
         elif data.get('indent') == 'gene':
-            contents.append(html.H5('Gene ID: ' + data.get('label')))
+            contents.append(html.H5('Gene name: ' + data.get('label')))
+            contents.append(html.P('Gene ENSG ID: ' + data.get('id')))
             return contents
         elif data.get('indent') == 'ortholog':
             contents.append(html.H5('Ortholog ID: ' + data.get('label')))
@@ -682,7 +702,7 @@ def select_organism(value_orth, UpLow, LowLevel, n, hg_value):
 
     # LOWER -> first check in which pathway you are -> go through pathway_list
     # then the options are the same as in UPPER LEVEL:
-    # 1) no search = whole graph, 2) search = edgesNnodes_HG; 3) not fount = text
+    # 1) no search = whole graph, 2) search = edgesNnodes_HG; 3) not found = text
 
     if value_orth == 'all organisms':
         if UpLow == 1:
