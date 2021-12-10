@@ -5,6 +5,10 @@ import pandas as pd
 
 
 def select_from_pathway_genes(pathway_name: str) -> List[str]:
+    """Retrieve a list of genes belonging to a pathway.
+    :param pathway_name: the name of the pathway
+    :return: a list of gene IDs belonging to a pathway
+    """
     genes = []
     try:
         conn = psycopg2.connect(user="lfxnboorsrhevw",
@@ -25,6 +29,10 @@ def select_from_pathway_genes(pathway_name: str) -> List[str]:
 
 
 def select_from_gene_names(human_genes: list) -> list:
+    """Select names for the list of ENSG IDs.
+    :param human_genes: a list of ENSG IDs
+    :return: a list of names
+    """
     names = []
     try:
         conn = psycopg2.connect(user="lfxnboorsrhevw",
@@ -47,7 +55,6 @@ def select_from_gene_names(human_genes: list) -> list:
 
 def select_from_enrichment_results(pathway_name: str) -> pd.DataFrame:
     """Select rows corresponding to the records for `pathway_name`.
-
     :param pathway_name: the name of the pathway to be passed in query
     :return: df corresponding to the records for `pathway_name`
     """
@@ -86,7 +93,7 @@ def select_from_enrichment_results(pathway_name: str) -> pd.DataFrame:
         conn.close()
 
         result["Ortholog_Genes"] = ortholog_genes
-        result["Human_ID"] = human_genes     #select_from_gene_names(human_genes)
+        result["Human_ID"] = human_genes  # select_from_gene_names(human_genes)
         result["Organism"] = organism
         result["Enriched_Phenotypes"] = enriched_phenotypes
         result["Human_Gene"] = select_from_gene_names(human_genes)
@@ -99,7 +106,6 @@ def select_from_enrichment_results(pathway_name: str) -> pd.DataFrame:
 
 def find_top_level_pathway(pathway_name: str) -> str:
     """Find the name of the higher level pathway - if the pathway is the highest level None is returned.
-
     :param pathway_name: the name of the pathway to be passed in query
     :return: str corresponding to the higher level pathway name
     """
@@ -126,7 +132,6 @@ def find_top_level_pathway(pathway_name: str) -> str:
 
 def select_from_metadata(pathway_name: str) -> dict:
     """Select rows corresponding to the records for `pathway_name`.
-
     :param pathway_name: the name of the pathway to be passed in query
     :return: dictionary of metadata corresponding `pathway_name`
     """
@@ -153,6 +158,3 @@ def select_from_metadata(pathway_name: str) -> dict:
     except (Exception, psycopg2.Error) as error:
         print("Error while fetching data from PostgreSQL", error)
         return dict_metadata
-
-
-
