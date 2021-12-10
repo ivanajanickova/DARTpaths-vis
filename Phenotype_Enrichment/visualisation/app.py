@@ -204,8 +204,12 @@ def find_human_genes(elements):
     human_genes_list = []
     for i in list(range(0, len(elements))):
         x = str(elements[i].get('data').get('id'))
+        z = str(elements[i].get('data').get('label'))
         if x[0:3] == 'ENS':
             human_genes_list.append(x)
+            human_genes_list.append(z)
+
+
     return human_genes_list
 
 
@@ -223,12 +227,28 @@ def edgesNnodes_HG(els, human_gene):
     # find edges and nodes the the human gene
     for i in list(range(0, len(els))):
         x = els[i]
-        # edges
-        if els[i].get('data').get('source') == str(human_gene):
-            set_edges.append(x)
+
+        # when human_gene is gene_name:
+        if els[i].get('data').get('label') == str(human_gene):
+            ens_gene = str(els[i].get('data').get('id'))
+            #nodes
+            set_nodes.append(x)
+            #edges
+            for j in list(range(0, len(els))):
+                t = els[j]
+                if els[j].get('data').get('source') == ens_gene:
+                    set_edges.append(t)
+
+
+        # when human_gene = ensg number
         # nodes
         if els[i].get('data').get('id') == str(human_gene):
             set_nodes.append(x)
+
+        # edges
+        if els[i].get('data').get('source') == str(human_gene):
+            set_edges.append(x)
+
 
     # find the orthologs names from the human genes
     for j in list(range(0, len(set_edges))):
