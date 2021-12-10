@@ -5,6 +5,10 @@ import pandas as pd
 
 
 def select_from_pathway_genes(pathway_name: str) -> List[str]:
+    """Retrieve a list of genes belonging to a pathway.
+    :param pathway_name: the name of the pathway
+    :return: a list of gene IDs belonging to a pathway
+    """
     genes = []
     try:
         conn = psycopg2.connect(user="lfxnboorsrhevw",
@@ -25,6 +29,10 @@ def select_from_pathway_genes(pathway_name: str) -> List[str]:
 
 
 def select_from_gene_names(human_genes: list) -> list:
+    """Select names for the list of ENSG IDs.
+    :param human_genes: a list of ENSG IDs
+    :return: a list of names
+    """
     names = []
     try:
         conn = psycopg2.connect(user="lfxnboorsrhevw",

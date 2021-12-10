@@ -1,3 +1,5 @@
+"""Update database relation `GENE_NAMES` to the database."""
+
 import psycopg2
 import pandas as pd
 from db_inserts import DatabaseInserts
@@ -6,13 +8,16 @@ DBInsert = DatabaseInserts()
 
 
 def run_update_pipeline():
+    """Run the pipline that inserts IDs and names into the database."""
     genes = get_gene_ids()
     df = assign_names(genes)
-    print(df.head())
     DBInsert.insert_into_gene_names(df)
 
 
-def get_gene_ids():
+def get_gene_ids() -> list:
+    """Retrieve all gene IDs from the database.
+    :return: list of gene IDs
+    """
     genes = {}
     try:
         conn = psycopg2.connect(user="lfxnboorsrhevw",
@@ -35,7 +40,12 @@ def get_gene_ids():
         return genes
 
 
-def assign_names(genes) -> pd.DataFrame:
+def assign_names(genes: list) -> pd.DataFrame:
+    """Based on the `Homo_sapiens.GRCh38.104.chr.gtf` assign names to the IDs.
+    For downloading the `Homo_sapiens.GRCh38.104.chr.gtf` go to Enseble db.
+    :param genes: a list of IDs
+    :return: a dataframe associating IDs with names
+    """
     gene_ids = {id for id in genes}
     names = []
     ids = []
