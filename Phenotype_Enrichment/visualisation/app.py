@@ -73,7 +73,7 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
         # gene node positions
         pos_x, pos_y = coordinates.gene_coordinate(1, n_genes, count_n)
         cy_gene = {'data': {'id': gene,
-                            'indent': 'gene',  # add
+                            'indent': 'gene',
                             'label': gene_name,
                             'size': 4,
                             'fontsize': '1.5px'},
@@ -86,11 +86,11 @@ def load_info_to_graph(dataframe: pd.DataFrame, metadata: pd.DataFrame, n_genes:
         if ortholog != "NaN":
             cy_ortholog = {'data': {'id': ortholog,
                                     'label': ortholog,
-                                    'indent': 'ortholog',  # add
+                                    'indent': 'ortholog',
                                     'size': 2,
                                     'fontsize': '1px',
                                     'organism': organism},
-                           'classes': 'ortholog',  # add
+                           'classes': 'ortholog',
                            'selectable': True,  # Allow selected
                            'position': {'x': pos_x_ortholog, 'y': pos_y_ortholog}}
             cy_edge = {
@@ -174,7 +174,7 @@ metadata3 = db_retrieve.select_from_metadata("EthanolOxidation")  # metadata4
 
 # list of the possible pathways:
 # add pathways to this list, when you add more pathways
-path_list = ['AHR', 'Amino Oxidase', 'Ethanol Oxidation']  # add
+path_list = ['AHR', 'Amino Oxidase', 'Ethanol Oxidation']
 
 # nodes & edges: for each pathway
 # for each dataframe and metadata, create the nodes and edges with the function load_info_to_graph
@@ -482,9 +482,10 @@ body_layout = dbc.Container(
                 -----
                 ##### Description:
                 -----
-                For this demonstration, phenotypes of 4 model organisms were used to visualize the relationship between phenotypes of different organisms related to a particular human gene. The routes are linked to the routes that can be found in REACTOME (https://reactome.org/PathwayBrowser/).
+                For this demonstration, orthologs of four model organisms were used to visualize the
+                 relationship between phenotypes of different organisms related to a particular human gene. The input pathways can be found on [REACTOME](https://reactome.org/PathwayBrowser/).
 
-                The phenotype of each organism is shown in different colors on the map, as shown on the right.
+                The gene orthologs of each model organism are shown in different colours , as shown in the legend on the right.
                 """
                         )
                     ],
@@ -503,13 +504,13 @@ body_layout = dbc.Container(
                         html.Div(
                             topics_html,
                             style={
-                                "fontSize": 11,
+                                "fontSize": 15,
                                 "height": "100px",
                                 "overflow": "auto",
                             },
                         ),
                     ],
-                    sm=12,
+                    sm=15,
                     md=4,
                 )
             ]
@@ -520,15 +521,13 @@ body_layout = dbc.Container(
                     """
             -----
             ##### Node representation
-            There are three types of nodes in the graph. The blue nodes in the center indicate human genes in a chosen pathway. These nodes are directly linked to the second type of node indicating the orthologs of a model organism. The node color indicates which organism the orthologs belong to. The third type of knot (purple) on two sides is the phenotype enrichment of the organism model. The edges show the relationship of:
-            1. phenotypes and the related orthologs in the organism
-            2. Orthologous genes in the organism and its human gene in the same molecular pathway in Reactome.
+            There are three types of nodes in the graph. The blue nodes in the center indicate human genes in a chosen pathway. These nodes are directly linked to the second type of node indicating the orthologs of a model organism. The node colour indicates which organism the ortholog belongs to. The third type of node (purple) on the two sides is the phenotype enrichment of the model organism. The edges show the relationship of:
+            1) human genes involved in Reactome pathway and their orthologs in selected model organisms, and
+            2) The orthologs in the organism and the related enriched phenotypes.
 
-            Initially, a specific gene can be searched for, based on its 'ENSG' number or gene name. This will display the specific graph for that gene.
-
-            The pathway is divided into two types, upper and lower pathway. This can be chosen at Level of pathway(s). The lowerpathway level consists of several sub-pathways, which can also be chosen.
-
-            Furthermore, filtering can be done on the basis of the model organism. Thus it is possible to only look at the graph of each organism separately.
+            Initially, a specific gene can be searched for using its 'ENSG' ID or gene name. This will display the specific graph for that gene.
+            The pathway is divided into upper and lower levels. This can be chosen at Level of pathway(s). The lower pathway level consists of several sub-pathways, which can also be specified.
+            Furthermore, filtering can be done on the basis of the model organism. Thus it is possible to only look at the graph of specific organism.
 
             -----
             """
@@ -545,7 +544,7 @@ body_layout = dbc.Container(
                                     id='cytoscape-phenotype',
                                     layout={"name": "preset"},
                                     style={"width": "100%", "height": "800px"},
-                                    elements=element,  # change
+                                    elements=element,
                                     stylesheet=graph_stylesheet,
                                     minZoom=0.6
                                 )
@@ -613,7 +612,7 @@ body_layout = dbc.Container(
                                         dcc.Dropdown(
                                             id="Lowest_Level",
                                             options=[{"label": name, "value": name}
-                                                     for name in path_list  # change
+                                                     for name in path_list
                                                      ],
                                             clearable=False,
                                             value=path_list[0],  # 'AHR'
