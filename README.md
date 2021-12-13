@@ -34,3 +34,6 @@
 * We recommend running this step on Linux machine
 * You may have to install some of the packages from requirements.txt manually
 
+### Contributors
+
+Diksha Bhalla, Nahdah Sholihah and Miguel Cisneiros contributed to the `Python_APRIL_2021_phenotype_enrichment.py` script
